@@ -12,6 +12,7 @@ import os
 import anndata as ad
 import numpy as np
 import scgen
+import torch
 from scgen._scgenvae import SCGENVAE
 
 # newer scvi-tools reads "qzm"/"qzv" from inference(), scgen still returns "qz_m"/"qz_v",
@@ -64,11 +65,22 @@ model = scgen.SCGEN(train)
 model.train(max_epochs=args.epochs, batch_size=32, early_stopping=True, early_stopping_patience=25)
 pred, _ = model.predict(ctrl_key="control", stim_key="stimulated", celltype_to_predict=args.holdout)
 
+# decoded (reconstructed) held-out controls. decoder output is smoother than real
+# cells, so pred - real ctrl mixes that smoothing in with the cytokine effect.
+# pred - recon ctrl cancels it and is the fair delta for scGen.
+z = model.get_latent_representation(adata[is_ho & ~is_stim])
+recon = model.module.generative(torch.tensor(z))["px"].detach().cpu().numpy()
+
 ctrl = X[is_ho & ~is_stim].mean(0)
 real = X[is_ho & is_stim].mean(0)
 others = [c for c in np.unique(ct) if c != args.holdout]
 shift = np.mean([X[(ct == c) & is_stim].mean(0) - X[(ct == c) & ~is_stim].mean(0) for c in others], axis=0)
-preds = {"scGen": np.asarray(pred.X).mean(0), "naive": ctrl + shift}
+# each entry: (predicted mean, control mean it is compared against)
+preds = {
+    "scGen": (np.asarray(pred.X).mean(0), recon.mean(0)),
+    "scGen_vs_real_ctrl": (np.asarray(pred.X).mean(0), ctrl),
+    "naive": (ctrl + shift, ctrl),
+}
 
 # score delta (pred - ctrl) vs (real - ctrl). most genes barely move, so also
 # report r on the 100 genes with the largest real change.
@@ -79,18 +91,19 @@ os.makedirs(args.outdir, exist_ok=True)
 csv = os.path.join(args.outdir, "results.csv")
 header = not os.path.exists(csv)
 print(f"\n{args.cytokine} | held out: {args.holdout}")
-print(f"{'model':<8}{'r_all':>8}{'mse':>10}{'r_top100':>10}")
+print(f"{'model':<20}{'r_all':>8}{'mse':>10}{'r_top100':>10}")
 with open(csv, "a") as f:
     if header:
         f.write("cytokine,holdout,model,r_all,mse,r_top100\n")
-    for name, m in preds.items():
-        d = m - ctrl
+    for name, (m, base) in preds.items():
+        d = m - base
         r = np.corrcoef(d, real_d)[0, 1]
         mse = np.mean((d - real_d) ** 2)
         r_top = np.corrcoef(d[top], real_d[top])[0, 1]
-        print(f"{name:<8}{r:>8.3f}{mse:>10.5f}{r_top:>10.3f}")
+        print(f"{name:<20}{r:>8.3f}{mse:>10.5f}{r_top:>10.3f}")
         f.write(f'"{args.cytokine}","{args.holdout}",{name},{r:.4f},{mse:.6f},{r_top:.4f}\n')
 
 tag = f"{args.cytokine}__{args.holdout.replace(' ', '_').replace('/', '-')}"
 model.save(os.path.join(args.outdir, tag), overwrite=True)
 pred.write_h5ad(os.path.join(args.outdir, tag + "_pred.h5ad"))
+ad.AnnData(X=recon, obs=pred.obs.copy(), var=pred.var.copy()).write_h5ad(os.path.join(args.outdir, tag + "_recon.h5ad"))
