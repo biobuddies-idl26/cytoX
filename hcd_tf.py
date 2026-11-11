@@ -87,7 +87,7 @@ if args.mode == "truth":
     print(pd.DataFrame(rows).T.round(3))
 
 else:
-    files = sorted(glob.glob(os.path.join(args.runs, "*_pred.h5ad")))
+    files = sorted(glob.glob(os.path.join(args.runs, "**", "*_pred.h5ad"), recursive=True))  # delta runs write one subfolder per task
     if not files:
         raise SystemExit(f"no *_pred.h5ad in {args.runs}, run scgen_baseline.py first")
 
