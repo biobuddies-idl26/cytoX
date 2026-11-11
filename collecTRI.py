@@ -80,3 +80,21 @@ def compare(pred, true):
             "n_tfs": ok.sum(),
         })
     return pd.DataFrame(rows).set_index("group")
+
+
+def shuffle_net(net, seed=0):
+    # ablation: same TFs, same number of targets per TF, same signs, but targets
+    # randomly reassigned. if a model does as well on this, the TF structure isn't what helps.
+    rng = np.random.default_rng(seed)
+    out = net.copy()
+    out["target"] = rng.permutation(out["target"].values)
+    return out.drop_duplicates(["source", "target"]).reset_index(drop=True)
+
+
+def get_net(name, seed=0):
+    net = load_collectri()
+    if name == "shuffled":
+        net = shuffle_net(net, seed)
+    elif name != "collectri":
+        raise ValueError(f"unknown net {name}")
+    return net

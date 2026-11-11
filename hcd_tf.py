@@ -22,7 +22,7 @@ import numpy as np
 import pandas as pd
 import scanpy as sc
 
-from collecTRI import load_collectri, filter_net, tf_scores, delta_tf, compare
+from collecTRI import get_net, filter_net, tf_scores, delta_tf, compare
 
 RARE = ["pDC", "HSPC", "ILC", "Plasmablast"]  # same exclusion as scgen_baseline.py
 
@@ -39,6 +39,8 @@ p = argparse.ArgumentParser()
 p.add_argument("mode", choices=["truth", "pred"])
 p.add_argument("--data", default="data/hcd_subset_allgenes.h5ad")
 p.add_argument("--runs", default="data/scgen_runs")
+p.add_argument("--net", choices=["collectri", "shuffled"], default="collectri",
+               help="shuffled = ablation with randomly reassigned TF targets (pred mode)")
 args = p.parse_args()
 
 adata = ad.read_h5ad(args.data)
@@ -46,7 +48,7 @@ adata = adata[~adata.obs["cell_type"].isin(RARE)].copy()
 adata.obs_names_make_unique()  # delta_tf indexes obs by name
 adata.obs["cell_type"] = adata.obs["cell_type"].astype(str)
 adata.obs["cytokine"] = adata.obs["cytokine"].astype(str)
-net = load_collectri()
+net = get_net(args.net)
 print(adata.shape, "|", net["source"].nunique(), "TFs in collectri")
 
 if args.mode == "truth":
@@ -125,5 +127,6 @@ else:
         print(f"{cyto} | {holdout}: pearson {r['pearson']:.3f}, sign agree {r['sign_agree']:.2f}, {int(r['n_tfs'])} TFs")
 
     out = pd.DataFrame(rows)[["cytokine", "holdout", "pearson", "mse", "sign_agree", "n_tfs"]]
-    out.to_csv(os.path.join(args.runs, "tf_results.csv"), index=False)
-    print(f"\nsaved {os.path.join(args.runs, 'tf_results.csv')}")
+    name = "tf_results.csv" if args.net == "collectri" else f"tf_results_{args.net}.csv"
+    out.to_csv(os.path.join(args.runs, name), index=False)
+    print(f"\nsaved {os.path.join(args.runs, name)}")
