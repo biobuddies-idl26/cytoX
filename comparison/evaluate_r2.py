@@ -13,6 +13,7 @@ Metrics:
     delta_r_all     Pearson r of (pred - ctrl) vs (real - ctrl), all genes
     delta_mse       mean squared error of the same deltas
     delta_r_top100  same r on the 100 genes with the largest |real - ctrl|
+    delta_mse       same mean squared error on the 100 genes with the largest |real-ctrl|
   Paper (scGen Fig. 2, calc_R2), computed on mean expression:
     r2_meanexpr_all         R^2 of mean(pred) vs mean(real), all genes
     r2_meanexpr_top100deg   same on top 100 Wilcoxon DEGs (real_stim vs ctrl/pred)
@@ -106,10 +107,10 @@ def score_file(path, label, cytokine, ct_key="cell_type", cond_key="condition"):
         base = dict(dataset=label, cytokine=cytokine, held_out=ct, n_real=real.shape[0], n_other_cell_types=len(others))
         a_all, a_sd = boot_r2(pred, real, rng)
         a_top, a_top_sd = boot_r2(pred, real, rng, degs)
-        rows.append(dict(base, model="scGen", **delta_metrics(pred.mean(0), ctrl_m, real_m, top_delta),
+        rows.append(dict(base, model="scGen", **delta_metrics(pred.mean(0), ctrl_m, real_m, degs),
                          r2_meanexpr_all=a_all, r2_meanexpr_all_sd=a_sd,
                          r2_meanexpr_top100deg=a_top, r2_meanexpr_top100deg_sd=a_top_sd))
-        rows.append(dict(base, model="naive", **delta_metrics(naive_m, ctrl_m, real_m, top_delta),
+        rows.append(dict(base, model="naive", **delta_metrics(naive_m, ctrl_m, real_m, degs),
                          r2_meanexpr_all=r2(naive_m, real_m), r2_meanexpr_all_sd=np.nan,
                          r2_meanexpr_top100deg=r2(naive_m[degs], real_m[degs]), r2_meanexpr_top100deg_sd=np.nan))
         for r in rows[-2:]:
