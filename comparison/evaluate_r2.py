@@ -57,8 +57,9 @@ def boot_r2(pred, real, rng, genes=None):
 def delta_metrics(pred_mean, ctrl_mean, real_mean, top):
     d, real_d = pred_mean - ctrl_mean, real_mean - ctrl_mean
     return dict(delta_r_all=np.corrcoef(d, real_d)[0, 1],
-                delta_mse=np.mean((d - real_d) ** 2),
-                delta_r_top100=np.corrcoef(d[top], real_d[top])[0, 1])
+                delta_mse_all=np.mean((d - real_d) ** 2),
+                delta_r_top100=np.corrcoef(d[top], real_d[top])[0, 1],
+                delta_mse_top_100=np.mean((d[top] - real_d[top]) ** 2))
 
 
 def score_file(path, label, cytokine, ct_key="cell_type", cond_key="condition"):
