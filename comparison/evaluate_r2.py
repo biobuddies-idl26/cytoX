@@ -89,8 +89,18 @@ def score_file(path, label, cytokine, ct_key="cell_type", cond_key="condition"):
         naive_m = ctrl_m + shift
 
         top_delta = np.argsort(-np.abs(real_m - ctrl_m))[:100]
-        sc.tl.rank_genes_groups(cell, groupby=cond_key, n_genes=100, method="wilcoxon")
-        degs = [cell.var_names.get_loc(g) for g in cell.uns["rank_genes_groups"]["names"][f"{ct}_real_stim"]]
+        # DEGs from real data: held-out stimulated cells vs. their own controls
+        # Predicted cells are excluded, so the gene list doesn't depend on the model
+        real_only = cell[cell.obs[cond_key].isin([f"{ct}_ctrl", f"{ct}_real_stim"]).values].copy()
+        sc.tl.rank_genes_groups(real_only, groupby=cond_key,
+                                groups=[f"{ct}_real_stim"], reference=f"{ct}_ctrl",
+                                method="wilcoxon", n_genes=real_only.n_vars)
+        
+        # rank by |score| so the list includes both up- and down-regulated genes
+        names = real_only.uns["rank_genes_groups"]["names"][f"{ct}_real_stim"]
+        scores = real_only.uns["rank_genes_groups"]["scores"][f"{ct}_real_stim"]
+        order = np.argsort(-np.abs(scores))[:100]
+        degs = [cell.var_names.get_loc(names[i]) for i in order]
 
         base = dict(dataset=label, cytokine=cytokine, held_out=ct, n_real=real.shape[0], n_other_cell_types=len(others))
         a_all, a_sd = boot_r2(pred, real, rng)
