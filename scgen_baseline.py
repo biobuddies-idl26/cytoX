@@ -13,6 +13,7 @@ import anndata as ad
 import numpy as np
 import scgen
 import torch
+import wandb
 from scgen._scgenvae import SCGENVAE
 
 # newer scvi-tools reads "qzm"/"qzv" from inference(), scgen still returns "qz_m"/"qz_v",
@@ -39,6 +40,11 @@ p.add_argument("--data", default="data/hcd_subset.h5ad")
 p.add_argument("--epochs", type=int, default=100)
 p.add_argument("--keep-rare", action="store_true")
 p.add_argument("--outdir", default="data/scgen_runs")
+p.add_argument("--n-layers", type=int, default=2)
+p.add_argument("--n-hidden", type=int, default=800)
+p.add_argument("--n-latent", type=int, default=100)
+p.add_argument("--wandb-project", default=None, help="log to W&B if set")
+p.add_argument("--wandb-group", default=None, help="e.g. L4, groups all tasks of one config")
 args = p.parse_args()
 
 adata = ad.read_h5ad(args.data)
@@ -60,9 +66,40 @@ is_stim = (adata.obs["condition"] == "stimulated").values
 train = adata[~(is_ho & is_stim)].copy()
 print(f"train: {train.n_obs:,} cells, held out: {int((is_ho & is_stim).sum()):,} stim {args.holdout}")
 
-scgen.SCGEN.setup_anndata(train, batch_key="condition", labels_key="cell_type")
-model = scgen.SCGEN(train)
+# initiate wandb run
+run = None
+if args.wandb_project:
+    run = wandb.init(
+        entity="scgen",                      # your team's W&B entity name
+        project=args.wandb_project,
+        group=args.wandb_group,              # e.g. all 4-layer tasks together
+        name=f"{args.cytokine} | {args.holdout}",
+        config={
+            "cytokine": args.cytokine,
+            "holdout": args.holdout,
+            "n_layers": args.n_layers,
+            "n_hidden": args.n_hidden,                 
+            "n_latent": args.n_latent,                 
+            "max_epochs": args.epochs,
+            "batch_size": 32,
+            "n_genes": train.n_vars,
+            "n_train_cells": train.n_obs,
+        },
+    )
+
+# initiate model setup
+model = scgen.SCGEN(train, n_layers=args.n_layers, n_hidden=args.n_hidden, n_latent=args.n_latent)
+print(model.module)   # logs the actual architecture so you can confirm it
 model.train(max_epochs=args.epochs, batch_size=32, early_stopping=True, early_stopping_patience=25)
+
+# log loss curves per epoch
+if run:
+    hist = model.history                      # dict: metric name -> DataFrame indexed by epoch
+    n_ep = max(len(v) for v in hist.values())
+    for ep in range(n_ep):
+        row = {k: float(v.iloc[ep, 0]) for k, v in hist.items() if ep < len(v)}
+        run.log(row, step=ep)
+
 pred, _ = model.predict(ctrl_key="control", stim_key="stimulated", celltype_to_predict=args.holdout)
 
 # decoded (reconstructed) held-out controls. decoder output is smoother than real
@@ -102,8 +139,14 @@ with open(csv, "a") as f:
         r_top = np.corrcoef(d[top], real_d[top])[0, 1]
         print(f"{name:<20}{r:>8.3f}{mse:>10.5f}{r_top:>10.3f}")
         f.write(f'"{args.cytokine}","{args.holdout}",{name},{r:.4f},{mse:.6f},{r_top:.4f}\n')
+        if run:
+            run.summary[f"{name}/r_all"] = r
+            run.summary[f"{name}/mse"] = mse
+            run.summary[f"{name}/r_top100"] = r_top
 
 tag = f"{args.cytokine}__{args.holdout.replace(' ', '_').replace('/', '-')}"
 model.save(os.path.join(args.outdir, tag), overwrite=True)
 pred.write_h5ad(os.path.join(args.outdir, tag + "_pred.h5ad"))
 ad.AnnData(X=recon, obs=pred.obs.copy(), var=pred.var.copy()).write_h5ad(os.path.join(args.outdir, tag + "_recon.h5ad"))
+if run:
+    run.finish()
