@@ -87,7 +87,13 @@ if args.wandb_project:
         },
     )
 
+
 # initiate model setup
+
+scgen.SCGEN.setup_anndata(train, batch_key="condition", labels_key="cell_type")
+model = scgen.SCGEN(train, n_layers=args.n_layers, n_hidden=args.n_hidden, n_latent=args.n_latent)
+print(model.module)   # logs the actual architecture so you can confirm it
+model.train(max_epochs=args.epochs, batch_size=32, early_stopping=True, early_stopping_patience=25)
 model = scgen.SCGEN(train, n_layers=args.n_layers, n_hidden=args.n_hidden, n_latent=args.n_latent)
 print(model.module)   # logs the actual architecture so you can confirm it
 model.train(max_epochs=args.epochs, batch_size=32, early_stopping=True, early_stopping_patience=25)
