@@ -7,8 +7,8 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8
-#SBATCH --mem=64g
-#SBATCH --time=08:00:00
+#SBATCH --mem=16g
+#SBATCH --time=03:00:00
 #SBATCH --output=logs/scgen_%A_%a.log
 
 source ~/miniforge3/etc/profile.d/conda.sh
