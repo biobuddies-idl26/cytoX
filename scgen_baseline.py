@@ -84,20 +84,19 @@ if args.wandb_project:
             "batch_size": 32,
             "n_genes": train.n_vars,
             "n_train_cells": train.n_obs,
+            "early_stopping_monitor": "validation_loss", 
         },
     )
 
 
 # initiate model setup
-
 scgen.SCGEN.setup_anndata(train, batch_key="condition", labels_key="cell_type")
 model = scgen.SCGEN(train, n_layers=args.n_layers, n_hidden=args.n_hidden, n_latent=args.n_latent)
 print(model.module)   # logs the actual architecture so you can confirm it
-model.train(max_epochs=args.epochs, batch_size=32, early_stopping=True, early_stopping_patience=25)
-model = scgen.SCGEN(train, n_layers=args.n_layers, n_hidden=args.n_hidden, n_latent=args.n_latent)
-print(model.module)   # logs the actual architecture so you can confirm it
-model.train(max_epochs=args.epochs, batch_size=32, early_stopping=True, early_stopping_patience=25)
-
+# stop on the weighted training objective (validation_loss), as in the scGen paper.
+# elbo_validation counts the unweighted KL, which rises even while the model improves.
+model.train(max_epochs=args.epochs, batch_size=32, early_stopping=True,
+            early_stopping_patience=25, early_stopping_monitor="validation_loss")
 # log loss curves per epoch
 if run:
     hist = model.history                      # dict: metric name -> DataFrame indexed by epoch
