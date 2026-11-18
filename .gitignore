@@ -12,4 +12,12 @@ venv/
 # mac
 .DS_Store
 logs/
+HEAD
 wandb/
+
+
+# data and outputs
+data/
+*.h5ad
+logs/
+2e00b7ca88fd2df6098236a88559535e715c1406
