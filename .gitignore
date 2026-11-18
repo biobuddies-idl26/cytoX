@@ -12,3 +12,4 @@ venv/
 # mac
 .DS_Store
 logs/
+wandb/
