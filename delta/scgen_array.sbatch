@@ -21,7 +21,10 @@ CYT=$(echo "$LINE" | cut -f1)
 CT=$(echo "$LINE" | cut -f2)
 
 # architecture (defaults = original scGen paper: 2 layers x 800, 100-d latent)
-NL=${NL:-2}; NH=${NH:-800}; NZ=${NZ:-100}
+# sbatch --export=ALL,NL=4,NH=1024 ...
+NL=${NL:-2}
+NH=${NH:-800}
+NZ=${NZ:-100}
 echo "task $SLURM_ARRAY_TASK_ID | $CYT | held out: $CT | L=$NL H=$NH Z=$NZ | $(hostname) | $(date)"
 
 # W&B: compute nodes have internet, so runs log live

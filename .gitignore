@@ -12,3 +12,8 @@ venv/
 # mac
 .DS_Store
 logs/
+
+# data and outputs
+data/
+*.h5ad
+logs/
