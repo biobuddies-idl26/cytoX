@@ -1,0 +1,83 @@
+_wandb:
+    value:
+        cli_version: 0.31.0
+        e:
+            01a1f12e-1287-7d0b-980c-dfb16a0b36e3:
+                args:
+                    - --data
+                    - data/hcd_subset.h5ad
+                    - --cytokines
+                    - IFN-beta
+                    - --holdouts
+                    - CD14 Mono
+                    - --strategies
+                    - sum_counts
+                    - --thresholds
+                    - "10"
+                    - --epochs
+                    - "5"
+                codePath: pseudobulk_experiments.py
+                codePathLocal: pseudobulk_experiments.py
+                email: sveerama@andrew.cmu.edu
+                executable: /opt/miniconda3/envs/cytoX/bin/python
+                git:
+                    commit: 37d1c9e985e1fa10f5791a3f162176cd8e41773b
+                    remote: https://github.com/biobuddies-idl26/cytoX.git
+                host: svneniAir-6.local
+                os: macOS-26.6.2-arm64-arm-64bit
+                program: /Users/svneni/f26/idl/cyto-project/cytoX/pseudobulk_experiments.py
+                python: CPython 3.12.16
+                root: /Users/svneni/f26/idl/cyto-project/cytoX
+                startedAt: "2026-11-19T00:21:30.884191Z"
+                writerId: 01a1f12e-1287-7d0b-980c-dfb16a0b36e3
+        m: []
+        python_version: 3.12.16
+        t:
+            "1":
+                - 1
+                - 5
+                - 12
+                - 45
+                - 53
+                - 106
+            "2":
+                - 1
+                - 5
+                - 12
+                - 45
+                - 53
+                - 106
+            "3":
+                - 2
+                - 13
+                - 16
+            "4": 3.12.16
+            "5": 0.31.0
+            "10":
+                - 20
+            "12": 0.31.0
+            "13": darwin-arm64
+batch_size:
+    value: 32
+cytokine:
+    value: IFN-beta
+epochs_requested:
+    value: 5
+holdout:
+    value: CD14 Mono
+min_cells:
+    value: 10
+n_genes:
+    value: 7000
+n_heldout_stim_profiles:
+    value: 11
+n_profiles:
+    value: 302
+n_train_profiles:
+    value: 291
+seed:
+    value: 0
+strategy:
+    value: sum_counts
+target_sum:
+    value: 10000

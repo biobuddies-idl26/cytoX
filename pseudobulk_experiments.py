@@ -40,8 +40,8 @@ from pseudobulk import build_pseudobulk, paired_donor_summary
 # EDIT THESE THREE VALUES FOR YOUR WEIGHTS & BIASES WORKSPACE.
 # You can also override project/entity from the command line.
 # ---------------------------------------------------------------------------
-WANDB_PROJECT = "cytox-pseudobulk"
-WANDB_ENTITY = None          # e.g. "your-lab"; None uses your default W&B entity
+WANDB_PROJECT = "cytoX"
+WANDB_ENTITY = "scgen"          # e.g. "your-lab"; None uses your default W&B entity
 WANDB_MODE = "online"       # set to "offline" for local W&B buffering
 
 RARE_CELL_TYPES = ["pDC", "HSPC", "ILC", "Plasmablast"]

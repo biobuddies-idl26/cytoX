@@ -1,0 +1,24 @@
+2026-11-18 19:21:30,886 INFO    MainThread:6152 [wandb_setup.py:_flush():81] Current SDK version is 0.31.0
+2026-11-18 19:21:30,886 INFO    MainThread:6152 [wandb_setup.py:_flush():81] Configure stats pid to 6152
+2026-11-18 19:21:30,886 INFO    MainThread:6152 [wandb_setup.py:_flush():81] Loading settings from environment variables
+2026-11-18 19:21:30,886 INFO    MainThread:6152 [wandb_init.py:setup_run_log_directory():740] Logging user logs to /Users/svneni/f26/idl/cyto-project/cytoX/wandb/run-20261118_192130-ppm0o8ba/logs/debug.log
+2026-11-18 19:21:30,886 INFO    MainThread:6152 [wandb_init.py:setup_run_log_directory():741] Logging internal logs to /Users/svneni/f26/idl/cyto-project/cytoX/wandb/run-20261118_192130-ppm0o8ba/logs/debug-internal.log
+2026-11-18 19:21:30,886 INFO    MainThread:6152 [wandb_init.py:init():784] calling init triggers
+2026-11-18 19:21:30,886 INFO    MainThread:6152 [wandb_init.py:init():789] wandb.init called with sweep_config: {}
+config: {'cytokine': 'IFN-beta', 'holdout': 'CD14 Mono', 'strategy': 'sum_counts', 'min_cells': 10, 'n_genes': 7000, 'n_profiles': 302, 'n_train_profiles': 291, 'n_heldout_stim_profiles': 11, 'epochs_requested': 5, 'batch_size': 32, 'target_sum': 10000.0, 'seed': 0, '_wandb': {}}
+2026-11-18 19:21:30,886 INFO    MainThread:6152 [wandb_init.py:init():832] starting backend
+2026-11-18 19:21:30,886 INFO    MainThread:6152 [wandb_init.py:init():847] sending inform_init request
+2026-11-18 19:21:30,890 INFO    MainThread:6152 [wandb_init.py:init():852] backend started and connected
+2026-11-18 19:21:30,894 INFO    MainThread:6152 [wandb_init.py:init():922] updated telemetry
+2026-11-18 19:21:30,965 INFO    MainThread:6152 [wandb_init.py:init():940] communicating run to backend with 90.0 second timeout
+2026-11-18 19:21:31,740 INFO    MainThread:6152 [wandb_init.py:init():977] starting run threads in backend
+2026-11-18 19:21:31,836 INFO    MainThread:6152 [wandb_run.py:_console_start():2528] atexit reg
+2026-11-18 19:21:31,836 INFO    MainThread:6152 [wandb_run.py:_redirect():2378] redirect: wrap_raw
+2026-11-18 19:21:31,837 INFO    MainThread:6152 [wandb_run.py:_redirect():2447] Wrapping output streams.
+2026-11-18 19:21:31,837 INFO    MainThread:6152 [wandb_run.py:_redirect():2470] Redirects installed.
+2026-11-18 19:21:31,838 INFO    MainThread:6152 [wandb_init.py:init():1015] run started, returning control to user process
+2026-11-18 19:21:31,873 INFO    MainThread:6152 [wandb_run.py:_finish():2300] finishing run scgen/cytoX/ppm0o8ba
+2026-11-18 19:21:31,874 INFO    MainThread:6152 [wandb_run.py:_atexit_cleanup():2495] got exitcode: 0
+2026-11-18 19:21:31,874 INFO    MainThread:6152 [wandb_run.py:_restore():2477] restore
+2026-11-18 19:21:31,874 INFO    MainThread:6152 [wandb_run.py:_restore():2483] restore done
+2026-11-18 19:21:32,937 INFO    MainThread:6152 [wandb_run.py:_footer_sync_info():3908] logging synced files

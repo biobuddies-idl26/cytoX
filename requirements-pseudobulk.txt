@@ -1,3 +1,0 @@
-# Optional dependency for remote experiment tracking.
-# The core Python/AnnData/scanpy/scGen environment should match the existing project setup.
-wandb>=0.17

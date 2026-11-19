@@ -1,0 +1,31 @@
+{
+  "os":  "macOS-26.6.2-arm64-arm-64bit",
+  "python":  "CPython 3.12.16",
+  "startedAt":  "2026-11-19T00:21:30.884191Z",
+  "args":  [
+    "--data",
+    "data/hcd_subset.h5ad",
+    "--cytokines",
+    "IFN-beta",
+    "--holdouts",
+    "CD14 Mono",
+    "--strategies",
+    "sum_counts",
+    "--thresholds",
+    "10",
+    "--epochs",
+    "5"
+  ],
+  "program":  "/Users/svneni/f26/idl/cyto-project/cytoX/pseudobulk_experiments.py",
+  "codePath":  "pseudobulk_experiments.py",
+  "codePathLocal":  "pseudobulk_experiments.py",
+  "git":  {
+    "remote":  "https://github.com/biobuddies-idl26/cytoX.git",
+    "commit":  "37d1c9e985e1fa10f5791a3f162176cd8e41773b"
+  },
+  "email":  "sveerama@andrew.cmu.edu",
+  "root":  "/Users/svneni/f26/idl/cyto-project/cytoX",
+  "host":  "svneniAir-6.local",
+  "executable":  "/opt/miniconda3/envs/cytoX/bin/python",
+  "writerId":  "01a1f12e-1287-7d0b-980c-dfb16a0b36e3"
+}
