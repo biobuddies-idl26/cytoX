@@ -54,6 +54,20 @@ def test_forward_backward(encoder, space):
         assert A.shape == (6, 1, 2, T, T)
 
 
+def test_layer_options():
+    #separate encoder / decoder MLP depth + attention feed-forward width
+    vae = AttentionVAE(30, encoder_type="hybrid", space="genes", n_enc_layers=3, n_dec_layers=1, ff_mult=4, **SMALL)
+    n_lin = lambda seq: sum(isinstance(m, torch.nn.Linear) for m in seq)  # noqa: E731
+    assert n_lin(vae.encoder.trunk) == 3 and n_lin(vae.decoder.trunk) == 1
+    assert vae.encoder.blocks[0].ff[0].out_features == 4 * SMALL["d_model"]
+    x = torch.rand(6, 30)
+    x_hat, mu, logvar = vae(x)
+    vae.loss(x, x_hat, mu, logvar)[0].backward()
+    #n_layers shortcut --> sets both depths
+    vae2 = AttentionVAE(30, encoder_type="mlp", n_layers=3, **SMALL)
+    assert n_lin(vae2.encoder.trunk) == 3 and n_lin(vae2.decoder.trunk) == 3
+
+
 def test_loss_matches_scgen_formula():
     vae = AttentionVAE(10, encoder_type="mlp", **SMALL)
     x, x_hat = torch.rand(4, 10), torch.rand(4, 10)
@@ -124,11 +138,13 @@ def test_deltas_balance_metrics():
 def test_train_cli(tmp_path):
     path = tmp_path / "toy.h5ad"
     make_adata().write_h5ad(path)
-    for enc, sh in [("mlp", "mean"), ("attention", "cosine"), ("hybrid", "learned")]:
+    configs = [("mlp", "mean", []), ("attention", "cosine", []),
+               ("hybrid", "learned", ["--n-enc-layers", "3", "--n-dec-layers", "1", "--ff-mult", "4", "--dropout", "0.1"])]
+    for enc, sh, extra in configs:
         cmd = [sys.executable, os.path.join(ROOT, "cytoX_attention", "train.py"), "--data", str(path), "--holdout", "A",
                "--encoder", enc, "--shift", sh, "--epochs", "2", "--shift-epochs", "2", "--n-latent", "8",
                "--n-hidden", "32", "--n-tokens", "8", "--d-model", "16", "--n-heads", "2", "--n-attn-layers", "1",
-               "--outdir", str(tmp_path / "out")]
+               "--outdir", str(tmp_path / "out")] + extra
         r = subprocess.run(cmd, capture_output=True, text=True)
         assert r.returncode == 0, r.stderr
     res = pd.read_csv(tmp_path / "out" / "results.csv")

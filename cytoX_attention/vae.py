@@ -1,4 +1,6 @@
 #scGen-style VAE with a swappable encoder --> mlp (scGen), attention, or hybrid
+from typing import Optional
+
 import torch
 from torch import nn
 
@@ -13,29 +15,34 @@ class AttentionVAE(nn.Module):
         encoder_type: str = "hybrid",
         space: str = "genes",
         n_hidden: int = 800,
-        n_layers: int = 2,
+        n_enc_layers: int = 2,
+        n_dec_layers: int = 2,
+        n_layers: Optional[int] = None,
         dropout: float = 0.2,
         n_tokens: int = 64,
         d_model: int = 64,
         n_heads: int = 4,
         n_attn_layers: int = 2,
         attn_dropout: float = 0.1,
+        ff_mult: int = 2,
         kl_weight: float = 5e-5,
     ):
         super().__init__()
         self.kl_weight = kl_weight
+        if n_layers is not None:
+            n_enc_layers = n_dec_layers = n_layers  #shortcut --> same MLP depth for encoder + decoder
         self.encoder_type = encoder_type
         if encoder_type == "mlp":
-            self.encoder = MLPEncoder(n_input, n_latent, n_hidden, n_layers, dropout)
+            self.encoder = MLPEncoder(n_input, n_latent, n_hidden, n_enc_layers, dropout)
         elif encoder_type in ("attention", "hybrid"):
             self.encoder = TokenAttentionEncoder(
                 n_input, n_latent, space=space, n_tokens=n_tokens, d_model=d_model, n_heads=n_heads,
-                n_attn_layers=n_attn_layers, attn_dropout=attn_dropout, hybrid=encoder_type == "hybrid",
-                n_hidden=n_hidden, n_layers=n_layers, dropout=dropout,
+                n_attn_layers=n_attn_layers, attn_dropout=attn_dropout, ff_mult=ff_mult, hybrid=encoder_type == "hybrid",
+                n_hidden=n_hidden, n_layers=n_enc_layers, dropout=dropout,
             )
         else:
             raise ValueError(f"encoder_type must be mlp / attention / hybrid, got {encoder_type}")
-        self.decoder = Decoder(n_latent, n_input, n_hidden, n_layers, dropout)
+        self.decoder = Decoder(n_latent, n_input, n_hidden, n_dec_layers, dropout)
 
     def encode(self, x, return_attn: bool = False):
         return self.encoder(x, return_attn)

@@ -51,6 +51,25 @@ m.fit(max_epochs=100); m.fit_shift()
 pred, delta, alpha = m.predict(ho_ctrl, "CD14 Mono", "IFN-beta")
 ```
 
+## Architecture flags
+| Flag | Default | Controls |
+|---|---|---|
+| `--encoder` | `hybrid` | `mlp` (scGen), `attention`, `hybrid` (attention + MLP path added together) |
+| `--space` | `genes` | `genes` (64 gene-module tokens) or `tf` (one token per TF) |
+| `--n-tokens` | 64 | number of gene-module tokens (gene space only) |
+| `--d-model` | 64 | length of each token vector |
+| `--n-heads` | 4 | attention heads per block (`d-model` must be divisible by it) |
+| `--n-attn-layers` | 2 | number of attention blocks |
+| `--ff-mult` | 2 | width of the feed-forward step in each attention block = `ff-mult × d-model` |
+| `--attn-dropout` | 0.1 | dropout inside attention blocks |
+| `--n-hidden` | 800 | width of every MLP hidden layer |
+| `--n-enc-layers` | 2 | hidden layers in the scGen MLP encoder path (`mlp` / `hybrid`; unused by `attention`) |
+| `--n-dec-layers` | 2 | hidden layers in the MLP decoder |
+| `--dropout` | 0.2 | dropout in the MLP layers |
+| `--n-latent` | 100 | latent size |
+
+From Python, `n_layers=k` sets the encoder and decoder depth together.
+
 ## Ablation grid
 Run `{mlp, attention, hybrid} × {mean, cosine, learned}` on the same held-out pairs and over several `--seed` values. The `mlp + mean` cell isolates what attention adds on top of scGen.
 

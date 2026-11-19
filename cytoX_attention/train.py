@@ -35,6 +35,11 @@ def parse():
     p.add_argument("--n-heads", type=int, default=4)
     p.add_argument("--n-attn-layers", type=int, default=2)
     p.add_argument("--n-hidden", type=int, default=800)
+    p.add_argument("--n-enc-layers", type=int, default=2, help="hidden layers in the scGen MLP encoder path (mlp / hybrid)")
+    p.add_argument("--n-dec-layers", type=int, default=2, help="hidden layers in the MLP decoder")
+    p.add_argument("--ff-mult", type=int, default=2, help="attention feed-forward width = ff_mult * d_model")
+    p.add_argument("--dropout", type=float, default=0.2, help="dropout in MLP layers")
+    p.add_argument("--attn-dropout", type=float, default=0.1, help="dropout in attention blocks")
     p.add_argument("--epochs", type=int, default=100)
     p.add_argument("--batch-size", type=int, default=32)
     p.add_argument("--lr", type=float, default=1e-3)
@@ -58,6 +63,8 @@ def main():
         train, cytokines, ctrl=args.ctrl, shift_mode=args.shift, shift_query=args.shift_query,
         encoder_type=args.encoder, space=args.space, n_latent=args.n_latent, n_tokens=args.n_tokens,
         d_model=args.d_model, n_heads=args.n_heads, n_attn_layers=args.n_attn_layers, n_hidden=args.n_hidden,
+        n_enc_layers=args.n_enc_layers, n_dec_layers=args.n_dec_layers, ff_mult=args.ff_mult,
+        dropout=args.dropout, attn_dropout=args.attn_dropout,
     )
     model.fit(max_epochs=args.epochs, batch_size=args.batch_size, lr=args.lr, patience=args.patience, seed=args.seed)
     info = model.fit_shift(decoded_weight=args.decoded_weight, epochs=args.shift_epochs, seed=args.seed, verbose=True)

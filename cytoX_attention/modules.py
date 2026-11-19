@@ -111,6 +111,7 @@ class TokenAttentionEncoder(nn.Module):
         n_heads: int = 4,
         n_attn_layers: int = 2,
         attn_dropout: float = 0.1,
+        ff_mult: int = 2,
         hybrid: bool = False,
         n_hidden: int = 800,
         n_layers: int = 2,
@@ -124,7 +125,7 @@ class TokenAttentionEncoder(nn.Module):
         else:
             raise ValueError(f"space must be 'genes' or 'tf', got {space}")
         self.cls = nn.Parameter(torch.zeros(1, 1, d_model))
-        self.blocks = nn.ModuleList([AttnBlock(d_model, n_heads, dropout=attn_dropout) for _ in range(n_attn_layers)])
+        self.blocks = nn.ModuleList([AttnBlock(d_model, n_heads, ff_mult=ff_mult, dropout=attn_dropout) for _ in range(n_attn_layers)])
         self.norm = nn.LayerNorm(d_model)
         self.hybrid = hybrid
         if hybrid:
