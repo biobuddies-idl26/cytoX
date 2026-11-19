@@ -9,8 +9,14 @@ venv/
 # mac
 .DS_Store
 
-# Local datasets
-data/*
+# local datasets
+data/
 
-# Local tests
+# local tests
 tests/
+
+# vscode
+.vscode
+
+# wandb
+wandb/

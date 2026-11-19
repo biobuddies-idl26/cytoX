@@ -105,6 +105,63 @@ def expression_metrics(pred_delta: np.ndarray, true_delta: np.ndarray) -> dict:
     }
 
 
+def _last_finite_scalar(value):
+    """Return the last finite scalar from a scvi/scGen history value."""
+    if isinstance(value, pd.DataFrame):
+        values = value.to_numpy().ravel()
+    elif isinstance(value, pd.Series):
+        values = value.to_numpy().ravel()
+    else:
+        try:
+            values = np.asarray(value).ravel()
+        except Exception:
+            return None
+    for item in values[::-1]:
+        try:
+            scalar = float(item)
+        except (TypeError, ValueError):
+            continue
+        if np.isfinite(scalar):
+            return scalar
+    return None
+
+
+def extract_training_metrics(model, train_result=None) -> dict:
+    """Extract available end-of-training metrics without fabricating values.
+
+    scvi-tools versions expose history slightly differently. Prefer
+    ``model.history`` and fall back to the return value from ``model.train``.
+    Only metrics that are actually present and finite are returned.
+    """
+    history = getattr(model, "history", None)
+    if not history and train_result is not None:
+        history = train_result
+    if not isinstance(history, dict):
+        return {}
+
+    aliases = {
+        "train_loss": ("train_loss", "train_loss_epoch", "loss_train"),
+        "validation_loss": ("validation_loss", "validation_loss_epoch", "loss_validation"),
+        "elbo_train": ("elbo_train",),
+        "elbo_validation": ("elbo_validation",),
+        "reconstruction_loss_train": ("reconstruction_loss_train",),
+        "reconstruction_loss_validation": ("reconstruction_loss_validation",),
+        "kl_global_train": ("kl_global_train",),
+        "kl_global_validation": ("kl_global_validation",),
+        "kl_local_train": ("kl_local_train",),
+        "kl_local_validation": ("kl_local_validation",),
+    }
+    extracted = {}
+    for output_name, candidates in aliases.items():
+        for key in candidates:
+            if key in history:
+                value = _last_finite_scalar(history[key])
+                if value is not None:
+                    extracted[output_name] = value
+                    break
+    return extracted
+
+
 def import_scgen():
     """Import the same external scGen package/API used by scgen_baseline.py."""
     try:
@@ -142,45 +199,6 @@ def get_group_profile(adata: ad.AnnData, cell_type: str, cytokine: str,
     if not np.any(mask):
         raise ValueError(f"No profile for cell_type={cell_type}, cytokine={cytokine}, donor={donor}")
     return dense_mean(adata.X[mask])
-
-
-def compute_naive_shift(pb: ad.AnnData, cytokine: str, holdout: str) -> np.ndarray:
-    """Average per-cell-type treatment-control shifts across training cell types.
-
-    For donor-specific pseudobulks, each cell type's shift is first averaged
-    across its available paired donors, so donors do not receive extra weight
-    merely because more profiles survived filtering.
-    """
-    obs = pb.obs
-    cell_types = sorted(set(obs["cell_type"].astype(str)) - {holdout})
-    shifts = []
-    for cell_type in cell_types:
-        sub = obs[obs["cell_type"].astype(str) == cell_type]
-        if (sub["donor"].astype(str) == "POOLED").all():
-            ctrl = pb[(pb.obs["cell_type"].astype(str) == cell_type) &
-                      (pb.obs["cytokine"].astype(str) == "PBS")]
-            stim = pb[(pb.obs["cell_type"].astype(str) == cell_type) &
-                      (pb.obs["cytokine"].astype(str) == cytokine)]
-            if ctrl.n_obs and stim.n_obs:
-                shifts.append(dense_mean(stim.X) - dense_mean(ctrl.X))
-        else:
-            donors = set(sub.loc[sub["cytokine"].astype(str) == "PBS", "donor"].astype(str)) & \
-                     set(sub.loc[sub["cytokine"].astype(str) == cytokine, "donor"].astype(str))
-            donor_shifts = []
-            for donor in sorted(donors):
-                ctrl = pb[(pb.obs["cell_type"].astype(str) == cell_type) &
-                          (pb.obs["cytokine"].astype(str) == "PBS") &
-                          (pb.obs["donor"].astype(str) == donor)]
-                stim = pb[(pb.obs["cell_type"].astype(str) == cell_type) &
-                          (pb.obs["cytokine"].astype(str) == cytokine) &
-                          (pb.obs["donor"].astype(str) == donor)]
-                if ctrl.n_obs and stim.n_obs:
-                    donor_shifts.append(dense_mean(stim.X) - dense_mean(ctrl.X))
-            if donor_shifts:
-                shifts.append(np.mean(donor_shifts, axis=0))
-    if not shifts:
-        raise ValueError("Cannot calculate naive shift: no paired training cell types")
-    return np.mean(shifts, axis=0)
 
 
 def evaluate_prediction(pb: ad.AnnData, pred: ad.AnnData, cytokine: str,
@@ -298,7 +316,7 @@ def append_result(path: Path, row: dict):
             writer.writerow(row)
 
 
-def init_wandb(config: dict, run_name: str, args):
+def init_wandb(config: dict, run_name: str, args, tags=None):
     if args.no_wandb:
         return None
     try:
@@ -313,6 +331,7 @@ def init_wandb(config: dict, run_name: str, args):
         mode=args.wandb_mode,
         name=run_name,
         config=config,
+        tags=tags or [],
         reinit=True,
     )
 
@@ -351,8 +370,14 @@ def run_one(pb: ad.AnnData, cytokine: str, holdout: str, strategy: str,
                 train.n_obs, batch_size, args.epochs)
     scgen.SCGEN.setup_anndata(train, batch_key="condition", labels_key="cell_type")
     model = scgen.SCGEN(train)
-    model.train(max_epochs=args.epochs, batch_size=batch_size,
-                early_stopping=True, early_stopping_patience=args.patience)
+    train_result = model.train(max_epochs=args.epochs, batch_size=batch_size,
+                               early_stopping=True,
+                               early_stopping_patience=args.patience)
+    training_metrics = extract_training_metrics(model, train_result)
+    if training_metrics:
+        logger.info("Available training metrics: %s", training_metrics)
+    else:
+        logger.info("No compatible training-history metrics exposed by this scGen version")
 
     logger.info("[5/6] Predicting held-out stimulated profiles for %s", holdout)
     pred, _ = model.predict(ctrl_key="control", stim_key="stimulated",
@@ -361,43 +386,62 @@ def run_one(pb: ad.AnnData, cytokine: str, holdout: str, strategy: str,
         raise RuntimeError("scGen returned an empty prediction")
 
     metrics, arrays = evaluate_prediction(pb, pred, cytokine, holdout, strategy)
-    naive_shift = compute_naive_shift(pb, cytokine, holdout)
-    naive_delta = naive_shift
-    naive_metrics = expression_metrics(naive_delta, arrays["true_delta"])
 
     logger.info("[6/6] Results | %s | holdout=%s | strategy=%s | min_cells=%d",
                 cytokine, holdout, strategy, min_cells)
     logger.info("scGen: r=%.4f mse=%.6f top100_r=%.4f sign=%.3f | mode=%s | n_eval_donors=%s",
                 metrics["pearson_all"], metrics["mse"], metrics["pearson_top100"],
                 metrics["sign_agreement"], metrics["evaluation_mode"], metrics["n_eval_donors"])
-    logger.info("Naive:  r=%.4f mse=%.6f top100_r=%.4f sign=%.3f",
-                naive_metrics["pearson_all"], naive_metrics["mse"],
-                naive_metrics["pearson_top100"], naive_metrics["sign_agreement"])
 
+    n_donors = (int(pb.obs.loc[pb.obs["donor"].astype(str) != "POOLED", "donor"].nunique())
+                if strategy != "pooled_donor" else int(pb.obs["n_donors"].max()))
+    n_train_source_cells = int(train.obs["n_cells"].sum())
     run_config = {
-        "cytokine": cytokine, "holdout": holdout, "strategy": strategy,
-        "min_cells": min_cells, "n_genes": pb.n_vars, "n_profiles": pb.n_obs,
-        "n_train_profiles": train.n_obs, "n_heldout_stim_profiles": heldout_stim_n,
-        "epochs_requested": args.epochs, "batch_size": batch_size,
-        "target_sum": args.target_sum, "seed": args.seed,
+        # Retain the familiar cell-level config names where they have a
+        # meaningful pseudobulk equivalent.
+        "batch_size": batch_size,
+        "cytokine": cytokine,
+        "early_stopping_monitor": "validation_loss",
+        "holdout": holdout,
+        "max_epochs": args.epochs,
+        "n_genes": pb.n_vars,
+        # Pseudobulk-specific metadata.
+        "aggregation_strategy": strategy,
+        "min_cells": min_cells,
+        "n_donors": n_donors,
+        "n_profiles": pb.n_obs,
+        "n_train_profiles": train.n_obs,
+        "n_heldout_stim_profiles": heldout_stim_n,
+        "n_train_source_cells": n_train_source_cells,
+        "target_sum": args.target_sum,
+        "seed": args.seed,
     }
-    run_name = "__".join([safe_name(strategy), f"min{min_cells}",
-                          safe_name(cytokine), safe_name(holdout)])
-    wandb_run = init_wandb(run_config, run_name, args)
+    # Keep the established cytokine | holdout naming convention and append
+    # strategy/threshold so configurations remain distinguishable.
+    run_name = f"{cytokine} | {holdout} | {safe_name(strategy)}_n{min_cells}"
+    wandb_run = init_wandb(
+        run_config, run_name, args,
+        tags=["pseudobulk", strategy, f"min_cells_{min_cells}"],
+    )
     if wandb_run is not None:
         import wandb
-        wandb.log({
-            **{f"metrics/scgen_{k}": v for k, v in metrics.items()
-               if isinstance(v, (int, float, np.number))},
-            **{f"metrics/naive_{k}": v for k, v in naive_metrics.items()},
+        wandb_metrics = {
+            "scGen/r_all": metrics["pearson_all"],
+            "scGen/r_top100": metrics["pearson_top100"],
+            "scGen/mse": metrics["mse"],
+            "scGen/sign_agreement": metrics["sign_agreement"],
             "data/n_profiles": pb.n_obs,
             "data/n_train_profiles": train.n_obs,
             "data/n_heldout_stim_profiles": heldout_stim_n,
             "data/n_eval_donors": metrics["n_eval_donors"],
+            "data/n_donors": n_donors,
+            "data/n_train_source_cells": n_train_source_cells,
             "data/median_cells_per_pseudobulk": float(pb.obs["n_cells"].median()),
             "data/min_cells_observed": int(pb.obs["n_cells"].min()),
             "data/max_cells_observed": int(pb.obs["n_cells"].max()),
-        })
+        }
+        wandb_metrics.update(training_metrics)
+        wandb.log(wandb_metrics)
         wandb_run.finish()
 
     tag = "__".join([safe_name(strategy), f"min{min_cells}",
@@ -406,7 +450,8 @@ def run_one(pb: ad.AnnData, cytokine: str, holdout: str, strategy: str,
     run_dir.mkdir(parents=True, exist_ok=True)
     pred.write_h5ad(run_dir / "prediction.h5ad", compression="gzip")
     with (run_dir / "metrics.json").open("w") as handle:
-        json.dump({"config": run_config, "scgen": metrics, "naive": naive_metrics},
+        json.dump({"config": run_config, "scgen": metrics,
+                   "training_metrics": training_metrics},
                   handle, indent=2, default=str)
     if args.save_model:
         model.save(str(run_dir / "model"), overwrite=True)
@@ -417,7 +462,7 @@ def run_one(pb: ad.AnnData, cytokine: str, holdout: str, strategy: str,
         "n_eval_donors": metrics["n_eval_donors"],
         **{f"scgen_{k}": v for k, v in metrics.items()
            if k not in {"evaluation_mode", "n_eval_donors"}},
-        **{f"naive_{k}": v for k, v in naive_metrics.items()},
+        **{f"training_{k}": v for k, v in training_metrics.items()},
         "run_name": run_name,
         "status": "success",
     }
