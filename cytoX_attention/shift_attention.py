@@ -3,6 +3,8 @@
 #here: shift for held-out type k = sum_t alpha_c(k, t) * delta_{t,c} --> similar cell types count more
 from typing import Dict, List, Optional
 
+import copy
+
 import numpy as np
 import torch
 from torch import nn
@@ -29,8 +31,11 @@ def compute_celltype_deltas(Z: np.ndarray, cell_type: np.ndarray, cytokine: np.n
 class ShiftAttention(nn.Module):
     #mode = mean    --> uniform weights (scGen)
     #mode = cosine  --> softmax(cos(query, m_t) / tau), no learned weights, tau picked by LOO
-    #mode = learned --> softmax((W_q [query ; e_c]) . (W_k m_t) / sqrt(d)), W_q starts at 0 --> starts as mean
-    def __init__(self, n_latent: int, n_cytokines: int, mode: str = "learned", d_attn: int = 32, tau: float = 0.1):
+    #mode = learned --> softmax(s * cos(W_q [query ; e_c], W_k m_t)), W_q starts at 0 --> starts as mean
+    #                   q / k are L2-normalised and the scale s is bounded to [s_min, s_max], so scores stay in
+    #                   [-s_max, s_max] and alpha cannot blow up to one-hot (unbounded dot products did)
+    def __init__(self, n_latent: int, n_cytokines: int, mode: str = "learned", d_attn: int = 32, tau: float = 0.1,
+                 s_min: float = 1.0, s_max: float = 5.0):
         super().__init__()
         if mode not in ("mean", "cosine", "learned"):
             raise ValueError(f"mode must be mean / cosine / learned, got {mode}")
@@ -41,7 +46,13 @@ class ShiftAttention(nn.Module):
             self.cyto_emb = nn.Embedding(n_cytokines, n_latent)
             self.W_q = nn.Linear(2 * n_latent, d_attn, bias=False)
             self.W_k = nn.Linear(n_latent, d_attn, bias=False)
-            nn.init.zeros_(self.W_q.weight)  #zero query --> all scores equal --> uniform alpha == scGen mean
+            nn.init.zeros_(self.W_q.weight)  #zero query --> normalised to 0 --> all scores equal --> uniform alpha == scGen mean
+            self.s_min, self.s_max = s_min, s_max
+            self.log_scale = nn.Parameter(torch.tensor(-2.0))  #sigmoid(-2) --> starts near s_min
+
+    def scale(self) -> torch.Tensor:
+        #bounded temperature: s in [s_min, s_max]
+        return self.s_min + (self.s_max - self.s_min) * torch.sigmoid(self.log_scale)
 
     def scores(self, query: torch.Tensor, c_idx: int, keys: torch.Tensor) -> torch.Tensor:
         #query (Q, D), keys (T, D) --> (Q, T)
@@ -52,9 +63,9 @@ class ShiftAttention(nn.Module):
             kn = nn.functional.normalize(keys, dim=-1)
             return qn @ kn.T / self.tau
         e = self.cyto_emb.weight[c_idx].expand(query.shape[0], -1)
-        q = self.W_q(torch.cat([query, e], dim=-1))
-        k = self.W_k(keys)
-        return q @ k.T / self.d_attn ** 0.5
+        q = nn.functional.normalize(self.W_q(torch.cat([query, e], dim=-1)), dim=-1)  #zero vector stays zero
+        k = nn.functional.normalize(self.W_k(keys), dim=-1)
+        return self.scale() * (q @ k.T)
 
     def forward(self, query, c_idx, keys, values, key_mask):
         #key_mask (T,) bool --> only cell types with an observed delta for this cytokine (never the held-out type)
@@ -96,11 +107,12 @@ def fit_loo(
     stim_means: Optional[torch.Tensor] = None,
     decoded_weight: float = 0.0,
     epochs: int = 200,
-    lr: float = 1e-2,
+    lr: float = 1e-3,
     weight_decay: float = 1e-3,
     tau_grid=(0.01, 0.03, 0.1, 0.3, 1.0, 3.0),
     seed: int = 0,
     verbose: bool = False,
+    eval_every: int = 10,
 ):
     #fit the shift attention on training cell types only, VAE frozen
     #query = celltype --> query is m_j; query = cell --> query is each control cell z_i of type j
@@ -140,7 +152,10 @@ def fit_loo(
         decoder.eval()
         for p in decoder.parameters():
             p.requires_grad_(False)
+    #keep the weights with the lowest LOO error, starting from the initial (== mean) weights,
+    #so the learned shift can never end up worse than scGen's mean on the training types
     init = loo_error(shift, stats, query_fn)
+    best_err, best_state, best_ep = init, copy.deepcopy(shift.state_dict()), -1
     for ep in range(epochs):
         order = torch.randperm(len(eps), generator=g)
         total = 0.0
@@ -163,6 +178,17 @@ def fit_loo(
             loss.backward()
             opt.step()
             total += loss.item()
+        if (ep + 1) % eval_every == 0 or ep == epochs - 1:
+            err = loo_error(shift, stats, query_fn)
+            if err < best_err:
+                best_err, best_state, best_ep = err, copy.deepcopy(shift.state_dict()), ep
         if verbose and (ep % 50 == 0 or ep == epochs - 1):
             print(f"  shift epoch {ep:>4} loss={total / len(eps):.5f}")
-    return {"loo_mse_init": init, "loo_mse": loo_error(shift, stats, query_fn)}
+    shift.load_state_dict(best_state)
+    if use_dec:
+        for p in decoder.parameters():
+            p.requires_grad_(True)
+    out = {"loo_mse_init": init, "loo_mse": best_err, "best_epoch": best_ep}
+    if shift.mode == "learned":
+        out["scale"] = float(shift.scale())
+    return out

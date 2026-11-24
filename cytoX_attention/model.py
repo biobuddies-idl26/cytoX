@@ -112,7 +112,7 @@ class CytoXAttention:
     def latent(self, adata=None) -> torch.Tensor:
         return self.vae.get_latent(self._X(adata))
 
-    def fit_shift(self, decoded_weight: float = 0.0, epochs: int = 200, lr: float = 1e-2, weight_decay: float = 1e-3, seed: int = 0, verbose: bool = False):
+    def fit_shift(self, decoded_weight: float = 0.0, epochs: int = 200, lr: float = 1e-3, weight_decay: float = 1e-3, seed: int = 0, verbose: bool = False):
         #encode training cells --> per-type ctrl means + deltas --> LOO fit of the shift attention
         Z = self.latent().numpy()
         ct = self.adata.obs[self.cell_type_key].values

@@ -34,6 +34,7 @@ def parse():
     p.add_argument("--shift-query", choices=["celltype", "cell"], default="celltype")
     p.add_argument("--decoded-weight", type=float, default=0.0, help=">0 --> also fit shift attention on decoded means")
     p.add_argument("--shift-epochs", type=int, default=200)
+    p.add_argument("--shift-lr", type=float, default=1e-3, help="learning rate for the learned shift attention")
     p.add_argument("--n-latent", type=int, default=100)
     p.add_argument("--n-tokens", type=int, default=64)
     p.add_argument("--d-model", type=int, default=64)
@@ -100,7 +101,8 @@ def main():
         dropout=args.dropout, attn_dropout=args.attn_dropout,
     )
     model.fit(max_epochs=args.epochs, batch_size=args.batch_size, lr=args.lr, patience=args.patience, seed=args.seed)
-    info = model.fit_shift(decoded_weight=args.decoded_weight, epochs=args.shift_epochs, seed=args.seed, verbose=True)
+    info = model.fit_shift(decoded_weight=args.decoded_weight, epochs=args.shift_epochs, lr=args.shift_lr,
+                          seed=args.seed, verbose=True)
     print(f"shift attention ({args.shift}): {info}")
 
     #baselines only see training cell types --> another held-out type's treated cells can never leak in
