@@ -44,14 +44,17 @@ def load_adata(
     return adata
 
 
-def split_holdout(adata: ad.AnnData, holdout: str, ctrl: str = "PBS", cytokine_key: str = "cytokine", cell_type_key: str = "cell_type"):
-    #extractor equivalent --> train = everything except the held-out type's treated cells (all cytokines)
-    #held-out type's PBS cells stay in training, as in scGen
+def split_holdout(adata: ad.AnnData, holdout, ctrl: str = "PBS", cytokine_key: str = "cytokine", cell_type_key: str = "cell_type"):
+    #extractor equivalent --> train = everything except the held-out types' treated cells (all cytokines)
+    #held-out types' PBS cells stay in training, as in scGen
+    #holdout --> one cell type (str) or several (list) for a single model
+    holdouts = [holdout] if isinstance(holdout, str) else list(holdout)
     ct = adata.obs[cell_type_key].values
     cy = adata.obs[cytokine_key].values
-    if holdout not in set(ct):
-        raise ValueError(f"no cell type '{holdout}'. options: {sorted(set(ct))}")
-    is_ho = ct == holdout
+    missing = sorted(set(holdouts) - set(ct))
+    if missing:
+        raise ValueError(f"no cell type {missing}. options: {sorted(set(ct))}")
+    is_ho = np.isin(ct, holdouts)
     is_stim = cy != ctrl
     train = adata[~(is_ho & is_stim)].copy()
     ho_ctrl = adata[is_ho & ~is_stim].copy()
