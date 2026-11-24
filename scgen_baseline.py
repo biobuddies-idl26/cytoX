@@ -12,6 +12,8 @@ import os
 import anndata as ad
 import numpy as np
 import scgen
+import torch
+import wandb
 from scgen._scgenvae import SCGENVAE
 
 # newer scvi-tools reads "qzm"/"qzv" from inference(), scgen still returns "qz_m"/"qz_v",
@@ -38,6 +40,11 @@ p.add_argument("--data", default="data/hcd_subset.h5ad")
 p.add_argument("--epochs", type=int, default=100)
 p.add_argument("--keep-rare", action="store_true")
 p.add_argument("--outdir", default="data/scgen_runs")
+p.add_argument("--n-layers", type=int, default=2)
+p.add_argument("--n-hidden", type=int, default=800)
+p.add_argument("--n-latent", type=int, default=100)
+p.add_argument("--wandb-project", default=None, help="log to W&B if set")
+p.add_argument("--wandb-group", default=None, help="e.g. L4, groups all tasks of one config")
 args = p.parse_args()
 
 adata = ad.read_h5ad(args.data)
@@ -59,16 +66,63 @@ is_stim = (adata.obs["condition"] == "stimulated").values
 train = adata[~(is_ho & is_stim)].copy()
 print(f"train: {train.n_obs:,} cells, held out: {int((is_ho & is_stim).sum()):,} stim {args.holdout}")
 
+# initiate wandb run
+run = None
+if args.wandb_project:
+    run = wandb.init(
+        entity="scgen",                      # your team's W&B entity name
+        project=args.wandb_project,
+        group=args.wandb_group,              # e.g. all 4-layer tasks together
+        name=f"{args.cytokine} | {args.holdout}",
+        config={
+            "cytokine": args.cytokine,
+            "holdout": args.holdout,
+            "n_layers": args.n_layers,
+            "n_hidden": args.n_hidden,                 
+            "n_latent": args.n_latent,                 
+            "max_epochs": args.epochs,
+            "batch_size": 32,
+            "n_genes": train.n_vars,
+            "n_train_cells": train.n_obs,
+            "early_stopping_monitor": "validation_loss", 
+        },
+    )
+
+
+# initiate model setup
 scgen.SCGEN.setup_anndata(train, batch_key="condition", labels_key="cell_type")
-model = scgen.SCGEN(train)
-model.train(max_epochs=args.epochs, batch_size=32, early_stopping=True, early_stopping_patience=25)
+model = scgen.SCGEN(train, n_layers=args.n_layers, n_hidden=args.n_hidden, n_latent=args.n_latent)
+print(model.module)   # logs the actual architecture so you can confirm it
+# stop on the weighted training objective (validation_loss), as in the scGen paper.
+# elbo_validation counts the unweighted KL, which rises even while the model improves.
+model.train(max_epochs=args.epochs, batch_size=32, early_stopping=True,
+            early_stopping_patience=25, early_stopping_monitor="validation_loss")
+# log loss curves per epoch
+if run:
+    hist = model.history                      # dict: metric name -> DataFrame indexed by epoch
+    n_ep = max(len(v) for v in hist.values())
+    for ep in range(n_ep):
+        row = {k: float(v.iloc[ep, 0]) for k, v in hist.items() if ep < len(v)}
+        run.log(row, step=ep)
+
 pred, _ = model.predict(ctrl_key="control", stim_key="stimulated", celltype_to_predict=args.holdout)
+
+# decoded (reconstructed) held-out controls. decoder output is smoother than real
+# cells, so pred - real ctrl mixes that smoothing in with the cytokine effect.
+# pred - recon ctrl cancels it and is the fair delta for scGen.
+z = model.get_latent_representation(adata[is_ho & ~is_stim])
+recon = model.module.generative(torch.tensor(z))["px"].detach().cpu().numpy()
 
 ctrl = X[is_ho & ~is_stim].mean(0)
 real = X[is_ho & is_stim].mean(0)
 others = [c for c in np.unique(ct) if c != args.holdout]
 shift = np.mean([X[(ct == c) & is_stim].mean(0) - X[(ct == c) & ~is_stim].mean(0) for c in others], axis=0)
-preds = {"scGen": np.asarray(pred.X).mean(0), "naive": ctrl + shift}
+# each entry: (predicted mean, control mean it is compared against)
+preds = {
+    "scGen": (np.asarray(pred.X).mean(0), recon.mean(0)),
+    "scGen_vs_real_ctrl": (np.asarray(pred.X).mean(0), ctrl),
+    "naive": (ctrl + shift, ctrl),
+}
 
 # score delta (pred - ctrl) vs (real - ctrl). most genes barely move, so also
 # report r on the 100 genes with the largest real change.
@@ -79,18 +133,25 @@ os.makedirs(args.outdir, exist_ok=True)
 csv = os.path.join(args.outdir, "results.csv")
 header = not os.path.exists(csv)
 print(f"\n{args.cytokine} | held out: {args.holdout}")
-print(f"{'model':<8}{'r_all':>8}{'mse':>10}{'r_top100':>10}")
+print(f"{'model':<20}{'r_all':>8}{'mse':>10}{'r_top100':>10}")
 with open(csv, "a") as f:
     if header:
         f.write("cytokine,holdout,model,r_all,mse,r_top100\n")
-    for name, m in preds.items():
-        d = m - ctrl
+    for name, (m, base) in preds.items():
+        d = m - base
         r = np.corrcoef(d, real_d)[0, 1]
         mse = np.mean((d - real_d) ** 2)
         r_top = np.corrcoef(d[top], real_d[top])[0, 1]
-        print(f"{name:<8}{r:>8.3f}{mse:>10.5f}{r_top:>10.3f}")
+        print(f"{name:<20}{r:>8.3f}{mse:>10.5f}{r_top:>10.3f}")
         f.write(f'"{args.cytokine}","{args.holdout}",{name},{r:.4f},{mse:.6f},{r_top:.4f}\n')
+        if run:
+            run.summary[f"{name}/r_all"] = r
+            run.summary[f"{name}/mse"] = mse
+            run.summary[f"{name}/r_top100"] = r_top
 
 tag = f"{args.cytokine}__{args.holdout.replace(' ', '_').replace('/', '-')}"
 model.save(os.path.join(args.outdir, tag), overwrite=True)
 pred.write_h5ad(os.path.join(args.outdir, tag + "_pred.h5ad"))
+ad.AnnData(X=recon, obs=pred.obs.copy(), var=pred.var.copy()).write_h5ad(os.path.join(args.outdir, tag + "_recon.h5ad"))
+if run:
+    run.finish()

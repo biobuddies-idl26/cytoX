@@ -1,0 +1,505 @@
+run,task,cytokine,holdout,model,r_all,mse,r_top100
+scgen_runs_L2_H800_Z100,task_000,IFN-beta,B Intermediate/Memory,scGen,0.752,0.002005,0.866
+scgen_runs_L2_H800_Z100,task_000,IFN-beta,B Intermediate/Memory,scGen_vs_real_ctrl,0.6952,0.002415,0.8317
+scgen_runs_L2_H800_Z100,task_000,IFN-beta,B Intermediate/Memory,naive,0.623,0.003526,0.7423
+scgen_runs_L2_H800_Z100,task_001,IFN-beta,B Naive,scGen,0.7682,0.003143,0.8792
+scgen_runs_L2_H800_Z100,task_001,IFN-beta,B Naive,scGen_vs_real_ctrl,0.7482,0.003057,0.8671
+scgen_runs_L2_H800_Z100,task_001,IFN-beta,B Naive,naive,0.5578,0.005252,0.7318
+scgen_runs_L2_H800_Z100,task_002,IFN-beta,CD14 Mono,scGen,0.7481,0.019943,0.8386
+scgen_runs_L2_H800_Z100,task_002,IFN-beta,CD14 Mono,scGen_vs_real_ctrl,0.7435,0.019842,0.855
+scgen_runs_L2_H800_Z100,task_002,IFN-beta,CD14 Mono,naive,0.5004,0.02337,0.5922
+scgen_runs_L2_H800_Z100,task_003,IFN-beta,CD16 Mono,scGen,0.7417,0.007777,0.8766
+scgen_runs_L2_H800_Z100,task_003,IFN-beta,CD16 Mono,scGen_vs_real_ctrl,0.6359,0.00921,0.8738
+scgen_runs_L2_H800_Z100,task_003,IFN-beta,CD16 Mono,naive,0.5745,0.009586,0.6508
+scgen_runs_L2_H800_Z100,task_004,IFN-beta,CD4 Memory,scGen,0.9079,0.001761,0.9599
+scgen_runs_L2_H800_Z100,task_004,IFN-beta,CD4 Memory,scGen_vs_real_ctrl,0.909,0.001508,0.9609
+scgen_runs_L2_H800_Z100,task_004,IFN-beta,CD4 Memory,naive,0.8306,0.002084,0.9311
+scgen_runs_L2_H800_Z100,task_005,IFN-beta,CD4 Naive,scGen,0.9037,0.001218,0.9706
+scgen_runs_L2_H800_Z100,task_005,IFN-beta,CD4 Naive,scGen_vs_real_ctrl,0.8716,0.001391,0.9658
+scgen_runs_L2_H800_Z100,task_005,IFN-beta,CD4 Naive,naive,0.7855,0.00225,0.8864
+scgen_runs_L2_H800_Z100,task_006,IFN-beta,CD8 Memory,scGen,0.9133,0.002085,0.9705
+scgen_runs_L2_H800_Z100,task_006,IFN-beta,CD8 Memory,scGen_vs_real_ctrl,0.8987,0.001981,0.9723
+scgen_runs_L2_H800_Z100,task_006,IFN-beta,CD8 Memory,naive,0.8288,0.002379,0.9444
+scgen_runs_L2_H800_Z100,task_007,IFN-beta,CD8 Naive,scGen,0.8742,0.001741,0.9647
+scgen_runs_L2_H800_Z100,task_007,IFN-beta,CD8 Naive,scGen_vs_real_ctrl,0.8403,0.001901,0.9474
+scgen_runs_L2_H800_Z100,task_007,IFN-beta,CD8 Naive,naive,0.7623,0.002642,0.9157
+scgen_runs_L2_H800_Z100,task_008,IFN-beta,MAIT,scGen,0.8498,0.002048,0.9133
+scgen_runs_L2_H800_Z100,task_008,IFN-beta,MAIT,scGen_vs_real_ctrl,0.8246,0.002117,0.9029
+scgen_runs_L2_H800_Z100,task_008,IFN-beta,MAIT,naive,0.7856,0.00244,0.9126
+scgen_runs_L2_H800_Z100,task_009,IFN-beta,NK,scGen,0.8398,0.002771,0.9155
+scgen_runs_L2_H800_Z100,task_009,IFN-beta,NK,scGen_vs_real_ctrl,0.7745,0.003034,0.8991
+scgen_runs_L2_H800_Z100,task_009,IFN-beta,NK,naive,0.752,0.00305,0.8575
+scgen_runs_L2_H800_Z100,task_010,IFN-beta,NK CD56bright,scGen,0.817,0.001517,0.9278
+scgen_runs_L2_H800_Z100,task_010,IFN-beta,NK CD56bright,scGen_vs_real_ctrl,0.8047,0.0016,0.9313
+scgen_runs_L2_H800_Z100,task_010,IFN-beta,NK CD56bright,naive,0.7647,0.002162,0.8818
+scgen_runs_L2_H800_Z100,task_011,IFN-beta,NKT,scGen,0.8421,0.00192,0.9415
+scgen_runs_L2_H800_Z100,task_011,IFN-beta,NKT,scGen_vs_real_ctrl,0.8079,0.002124,0.9312
+scgen_runs_L2_H800_Z100,task_011,IFN-beta,NKT,naive,0.7688,0.002555,0.9072
+scgen_runs_L2_H800_Z100,task_012,IFN-beta,Treg,scGen,0.8614,0.002145,0.9327
+scgen_runs_L2_H800_Z100,task_012,IFN-beta,Treg,scGen_vs_real_ctrl,0.843,0.002228,0.9257
+scgen_runs_L2_H800_Z100,task_012,IFN-beta,Treg,naive,0.7637,0.002831,0.8551
+scgen_runs_L2_H800_Z100,task_013,IFN-beta,cDC,scGen,0.7482,0.007959,0.871
+scgen_runs_L2_H800_Z100,task_013,IFN-beta,cDC,scGen_vs_real_ctrl,0.7855,0.007294,0.9133
+scgen_runs_L2_H800_Z100,task_013,IFN-beta,cDC,naive,0.5452,0.010286,0.5947
+scgen_runs_L2_H800_Z100,task_014,IFN-gamma,B Intermediate/Memory,scGen,0.5625,0.000981,0.7784
+scgen_runs_L2_H800_Z100,task_014,IFN-gamma,B Intermediate/Memory,scGen_vs_real_ctrl,0.5204,0.001226,0.7995
+scgen_runs_L2_H800_Z100,task_014,IFN-gamma,B Intermediate/Memory,naive,0.4978,0.00152,0.7105
+scgen_runs_L2_H800_Z100,task_015,IFN-gamma,B Naive,scGen,0.6073,0.001076,0.8183
+scgen_runs_L2_H800_Z100,task_015,IFN-gamma,B Naive,scGen_vs_real_ctrl,0.5992,0.001138,0.8107
+scgen_runs_L2_H800_Z100,task_015,IFN-gamma,B Naive,naive,0.5049,0.001607,0.6787
+scgen_runs_L2_H800_Z100,task_016,IFN-gamma,CD14 Mono,scGen,0.7687,0.009589,0.9016
+scgen_runs_L2_H800_Z100,task_016,IFN-gamma,CD14 Mono,scGen_vs_real_ctrl,0.6024,0.010674,0.9079
+scgen_runs_L2_H800_Z100,task_016,IFN-gamma,CD14 Mono,naive,0.4936,0.011645,0.6628
+scgen_runs_L2_H800_Z100,task_017,IFN-gamma,CD16 Mono,scGen,0.7202,0.005558,0.8937
+scgen_runs_L2_H800_Z100,task_017,IFN-gamma,CD16 Mono,scGen_vs_real_ctrl,0.6193,0.005751,0.8974
+scgen_runs_L2_H800_Z100,task_017,IFN-gamma,CD16 Mono,naive,0.4821,0.006255,0.6322
+scgen_runs_L2_H800_Z100,task_018,IFN-gamma,CD4 Memory,scGen,0.7934,0.001207,0.898
+scgen_runs_L2_H800_Z100,task_018,IFN-gamma,CD4 Memory,scGen_vs_real_ctrl,0.77,0.001137,0.8912
+scgen_runs_L2_H800_Z100,task_018,IFN-gamma,CD4 Memory,naive,0.7105,0.001335,0.9128
+scgen_runs_L2_H800_Z100,task_019,IFN-gamma,CD4 Naive,scGen,0.8355,0.001047,0.9485
+scgen_runs_L2_H800_Z100,task_019,IFN-gamma,CD4 Naive,scGen_vs_real_ctrl,0.7696,0.001167,0.9234
+scgen_runs_L2_H800_Z100,task_019,IFN-gamma,CD4 Naive,naive,0.6962,0.001456,0.8558
+scgen_runs_L2_H800_Z100,task_020,IFN-gamma,CD8 Memory,scGen,0.808,0.000725,0.922
+scgen_runs_L2_H800_Z100,task_020,IFN-gamma,CD8 Memory,scGen_vs_real_ctrl,0.8083,0.000682,0.9074
+scgen_runs_L2_H800_Z100,task_020,IFN-gamma,CD8 Memory,naive,0.6908,0.001102,0.8819
+scgen_runs_L2_H800_Z100,task_021,IFN-gamma,CD8 Naive,scGen,0.7957,0.000965,0.9376
+scgen_runs_L2_H800_Z100,task_021,IFN-gamma,CD8 Naive,scGen_vs_real_ctrl,0.7485,0.001067,0.926
+scgen_runs_L2_H800_Z100,task_021,IFN-gamma,CD8 Naive,naive,0.67,0.001374,0.9224
+scgen_runs_L2_H800_Z100,task_022,IFN-gamma,MAIT,scGen,0.7267,0.000867,0.8666
+scgen_runs_L2_H800_Z100,task_022,IFN-gamma,MAIT,scGen_vs_real_ctrl,0.6762,0.001082,0.8607
+scgen_runs_L2_H800_Z100,task_022,IFN-gamma,MAIT,naive,0.675,0.001114,0.8714
+scgen_runs_L2_H800_Z100,task_023,IFN-gamma,NK,scGen,0.7603,0.001512,0.9085
+scgen_runs_L2_H800_Z100,task_023,IFN-gamma,NK,scGen_vs_real_ctrl,0.6378,0.001835,0.8735
+scgen_runs_L2_H800_Z100,task_023,IFN-gamma,NK,naive,0.6612,0.001697,0.8119
+scgen_runs_L2_H800_Z100,task_024,IFN-gamma,NK CD56bright,scGen,0.5703,0.001232,0.7486
+scgen_runs_L2_H800_Z100,task_024,IFN-gamma,NK CD56bright,scGen_vs_real_ctrl,0.5051,0.001559,0.7353
+scgen_runs_L2_H800_Z100,task_024,IFN-gamma,NK CD56bright,naive,0.5703,0.001429,0.7104
+scgen_runs_L2_H800_Z100,task_025,IFN-gamma,NKT,scGen,0.7328,0.00081,0.8891
+scgen_runs_L2_H800_Z100,task_025,IFN-gamma,NKT,scGen_vs_real_ctrl,0.6015,0.001476,0.851
+scgen_runs_L2_H800_Z100,task_025,IFN-gamma,NKT,naive,0.6504,0.001169,0.8397
+scgen_runs_L2_H800_Z100,task_026,IFN-gamma,Treg,scGen,0.7161,0.001558,0.8221
+scgen_runs_L2_H800_Z100,task_026,IFN-gamma,Treg,scGen_vs_real_ctrl,0.6115,0.001837,0.7892
+scgen_runs_L2_H800_Z100,task_026,IFN-gamma,Treg,naive,0.6613,0.001662,0.7771
+scgen_runs_L2_H800_Z100,task_027,IFN-gamma,cDC,scGen,0.6534,0.007277,0.8604
+scgen_runs_L2_H800_Z100,task_027,IFN-gamma,cDC,scGen_vs_real_ctrl,0.5216,0.007864,0.838
+scgen_runs_L2_H800_Z100,task_027,IFN-gamma,cDC,naive,0.4612,0.008196,0.5475
+scgen_runs_L2_H800_Z100,task_028,IL-1-beta,B Intermediate/Memory,scGen,0.5156,0.001072,0.702
+scgen_runs_L2_H800_Z100,task_028,IL-1-beta,B Intermediate/Memory,scGen_vs_real_ctrl,0.5269,0.001291,0.7527
+scgen_runs_L2_H800_Z100,task_028,IL-1-beta,B Intermediate/Memory,naive,0.5135,0.00123,0.7708
+scgen_runs_L2_H800_Z100,task_029,IL-1-beta,B Naive,scGen,0.6099,0.001109,0.6997
+scgen_runs_L2_H800_Z100,task_029,IL-1-beta,B Naive,scGen_vs_real_ctrl,0.6238,0.001083,0.722
+scgen_runs_L2_H800_Z100,task_029,IL-1-beta,B Naive,naive,0.4689,0.001541,0.7924
+scgen_runs_L2_H800_Z100,task_030,IL-1-beta,CD14 Mono,scGen,0.6223,0.004239,0.8162
+scgen_runs_L2_H800_Z100,task_030,IL-1-beta,CD14 Mono,scGen_vs_real_ctrl,0.4732,0.005009,0.7642
+scgen_runs_L2_H800_Z100,task_030,IL-1-beta,CD14 Mono,naive,0.474,0.005032,0.5876
+scgen_runs_L2_H800_Z100,task_031,IL-1-beta,CD16 Mono,scGen,0.5735,0.002978,0.8603
+scgen_runs_L2_H800_Z100,task_031,IL-1-beta,CD16 Mono,scGen_vs_real_ctrl,0.3575,0.004035,0.7566
+scgen_runs_L2_H800_Z100,task_031,IL-1-beta,CD16 Mono,naive,0.4585,0.003368,0.5316
+scgen_runs_L2_H800_Z100,task_032,IL-1-beta,CD4 Memory,scGen,0.7882,0.001229,0.8981
+scgen_runs_L2_H800_Z100,task_032,IL-1-beta,CD4 Memory,scGen_vs_real_ctrl,0.7644,0.001175,0.885
+scgen_runs_L2_H800_Z100,task_032,IL-1-beta,CD4 Memory,naive,0.6929,0.001336,0.8619
+scgen_runs_L2_H800_Z100,task_033,IL-1-beta,CD4 Naive,scGen,0.7829,0.000807,0.9134
+scgen_runs_L2_H800_Z100,task_033,IL-1-beta,CD4 Naive,scGen_vs_real_ctrl,0.7113,0.000944,0.8837
+scgen_runs_L2_H800_Z100,task_033,IL-1-beta,CD4 Naive,naive,0.6755,0.00104,0.8856
+scgen_runs_L2_H800_Z100,task_034,IL-1-beta,CD8 Memory,scGen,0.6948,0.000766,0.8412
+scgen_runs_L2_H800_Z100,task_034,IL-1-beta,CD8 Memory,scGen_vs_real_ctrl,0.7102,0.000754,0.8588
+scgen_runs_L2_H800_Z100,task_034,IL-1-beta,CD8 Memory,naive,0.6421,0.000914,0.9053
+scgen_runs_L2_H800_Z100,task_035,IL-1-beta,CD8 Naive,scGen,0.7734,0.000918,0.9273
+scgen_runs_L2_H800_Z100,task_035,IL-1-beta,CD8 Naive,scGen_vs_real_ctrl,0.7346,0.001004,0.911
+scgen_runs_L2_H800_Z100,task_035,IL-1-beta,CD8 Naive,naive,0.6761,0.00118,0.8832
+scgen_runs_L2_H800_Z100,task_036,IL-1-beta,MAIT,scGen,0.7027,0.000729,0.88
+scgen_runs_L2_H800_Z100,task_036,IL-1-beta,MAIT,scGen_vs_real_ctrl,0.6857,0.000804,0.8809
+scgen_runs_L2_H800_Z100,task_036,IL-1-beta,MAIT,naive,0.6751,0.000826,0.9038
+scgen_runs_L2_H800_Z100,task_037,IL-1-beta,NK,scGen,0.6643,0.001032,0.8481
+scgen_runs_L2_H800_Z100,task_037,IL-1-beta,NK,scGen_vs_real_ctrl,0.6073,0.001261,0.8254
+scgen_runs_L2_H800_Z100,task_037,IL-1-beta,NK,naive,0.6374,0.001109,0.8201
+scgen_runs_L2_H800_Z100,task_038,IL-1-beta,NK CD56bright,scGen,0.5743,0.001224,0.7758
+scgen_runs_L2_H800_Z100,task_038,IL-1-beta,NK CD56bright,scGen_vs_real_ctrl,0.5504,0.001325,0.7898
+scgen_runs_L2_H800_Z100,task_038,IL-1-beta,NK CD56bright,naive,0.55,0.001352,0.74
+scgen_runs_L2_H800_Z100,task_039,IL-1-beta,NKT,scGen,0.5552,0.000953,0.7743
+scgen_runs_L2_H800_Z100,task_039,IL-1-beta,NKT,scGen_vs_real_ctrl,0.5608,0.00113,0.7873
+scgen_runs_L2_H800_Z100,task_039,IL-1-beta,NKT,naive,0.5523,0.001083,0.7675
+scgen_runs_L2_H800_Z100,task_040,IL-1-beta,Treg,scGen,0.6384,0.001502,0.8226
+scgen_runs_L2_H800_Z100,task_040,IL-1-beta,Treg,scGen_vs_real_ctrl,0.5381,0.001792,0.75
+scgen_runs_L2_H800_Z100,task_040,IL-1-beta,Treg,naive,0.6595,0.001398,0.8157
+scgen_runs_L2_H800_Z100,task_041,IL-1-beta,cDC,scGen,0.6637,0.004273,0.8498
+scgen_runs_L2_H800_Z100,task_041,IL-1-beta,cDC,scGen_vs_real_ctrl,0.566,0.004469,0.8206
+scgen_runs_L2_H800_Z100,task_041,IL-1-beta,cDC,naive,0.4469,0.005093,0.6132
+scgen_runs_L2_H800_Z100,task_042,IL-15,B Intermediate/Memory,scGen,0.7793,0.001015,0.9313
+scgen_runs_L2_H800_Z100,task_042,IL-15,B Intermediate/Memory,scGen_vs_real_ctrl,0.7623,0.001082,0.934
+scgen_runs_L2_H800_Z100,task_042,IL-15,B Intermediate/Memory,naive,0.616,0.002729,0.8223
+scgen_runs_L2_H800_Z100,task_043,IL-15,B Naive,scGen,0.7822,0.001425,0.9191
+scgen_runs_L2_H800_Z100,task_043,IL-15,B Naive,scGen_vs_real_ctrl,0.7526,0.00162,0.9046
+scgen_runs_L2_H800_Z100,task_043,IL-15,B Naive,naive,0.55,0.003565,0.8406
+scgen_runs_L2_H800_Z100,task_044,IL-15,CD14 Mono,scGen,0.6489,0.009518,0.8499
+scgen_runs_L2_H800_Z100,task_044,IL-15,CD14 Mono,scGen_vs_real_ctrl,0.4421,0.011337,0.7938
+scgen_runs_L2_H800_Z100,task_044,IL-15,CD14 Mono,naive,0.4745,0.010758,0.5407
+scgen_runs_L2_H800_Z100,task_045,IL-15,CD16 Mono,scGen,0.6449,0.006789,0.8352
+scgen_runs_L2_H800_Z100,task_045,IL-15,CD16 Mono,scGen_vs_real_ctrl,0.4991,0.007797,0.7874
+scgen_runs_L2_H800_Z100,task_045,IL-15,CD16 Mono,naive,0.4559,0.008418,0.506
+scgen_runs_L2_H800_Z100,task_046,IL-15,CD4 Memory,scGen,0.8829,0.001477,0.9426
+scgen_runs_L2_H800_Z100,task_046,IL-15,CD4 Memory,scGen_vs_real_ctrl,0.8707,0.001418,0.9377
+scgen_runs_L2_H800_Z100,task_046,IL-15,CD4 Memory,naive,0.7708,0.002165,0.8993
+scgen_runs_L2_H800_Z100,task_047,IL-15,CD4 Naive,scGen,0.8135,0.001743,0.9142
+scgen_runs_L2_H800_Z100,task_047,IL-15,CD4 Naive,scGen_vs_real_ctrl,0.778,0.001965,0.896
+scgen_runs_L2_H800_Z100,task_047,IL-15,CD4 Naive,naive,0.699,0.002634,0.8428
+scgen_runs_L2_H800_Z100,task_048,IL-15,CD8 Memory,scGen,0.9205,0.003388,0.9669
+scgen_runs_L2_H800_Z100,task_048,IL-15,CD8 Memory,scGen_vs_real_ctrl,0.9059,0.00296,0.957
+scgen_runs_L2_H800_Z100,task_048,IL-15,CD8 Memory,naive,0.8321,0.00326,0.9168
+scgen_runs_L2_H800_Z100,task_049,IL-15,CD8 Naive,scGen,0.8553,0.002465,0.9422
+scgen_runs_L2_H800_Z100,task_049,IL-15,CD8 Naive,scGen_vs_real_ctrl,0.8309,0.002497,0.9366
+scgen_runs_L2_H800_Z100,task_049,IL-15,CD8 Naive,naive,0.7187,0.003501,0.8527
+scgen_runs_L2_H800_Z100,task_050,IL-15,MAIT,scGen,0.8939,0.002288,0.9509
+scgen_runs_L2_H800_Z100,task_050,IL-15,MAIT,scGen_vs_real_ctrl,0.8666,0.002326,0.9508
+scgen_runs_L2_H800_Z100,task_050,IL-15,MAIT,naive,0.8075,0.002723,0.8825
+scgen_runs_L2_H800_Z100,task_051,IL-15,NK,scGen,0.8973,0.003906,0.9401
+scgen_runs_L2_H800_Z100,task_051,IL-15,NK,scGen_vs_real_ctrl,0.8837,0.004028,0.942
+scgen_runs_L2_H800_Z100,task_051,IL-15,NK,naive,0.731,0.005123,0.8024
+scgen_runs_L2_H800_Z100,task_052,IL-15,NK CD56bright,scGen,0.7337,0.010111,0.8717
+scgen_runs_L2_H800_Z100,task_052,IL-15,NK CD56bright,scGen_vs_real_ctrl,0.6907,0.010042,0.8776
+scgen_runs_L2_H800_Z100,task_052,IL-15,NK CD56bright,naive,0.5707,0.011369,0.7016
+scgen_runs_L2_H800_Z100,task_053,IL-15,NKT,scGen,0.8678,0.002885,0.9231
+scgen_runs_L2_H800_Z100,task_053,IL-15,NKT,scGen_vs_real_ctrl,0.8515,0.003011,0.9107
+scgen_runs_L2_H800_Z100,task_053,IL-15,NKT,naive,0.7596,0.003796,0.7957
+scgen_runs_L2_H800_Z100,task_054,IL-15,Treg,scGen,0.756,0.001696,0.9108
+scgen_runs_L2_H800_Z100,task_054,IL-15,Treg,scGen_vs_real_ctrl,0.7053,0.001982,0.8826
+scgen_runs_L2_H800_Z100,task_054,IL-15,Treg,naive,0.6577,0.002739,0.8182
+scgen_runs_L2_H800_Z100,task_055,IL-15,cDC,scGen,0.8298,0.004571,0.9143
+scgen_runs_L2_H800_Z100,task_055,IL-15,cDC,scGen_vs_real_ctrl,0.7057,0.005568,0.8744
+scgen_runs_L2_H800_Z100,task_055,IL-15,cDC,naive,0.5606,0.006876,0.6459
+scgen_runs_L2_H800_Z100,task_056,IL-32-beta,B Intermediate/Memory,scGen,0.603,0.001819,0.8497
+scgen_runs_L2_H800_Z100,task_056,IL-32-beta,B Intermediate/Memory,scGen_vs_real_ctrl,0.5726,0.001968,0.8324
+scgen_runs_L2_H800_Z100,task_056,IL-32-beta,B Intermediate/Memory,naive,0.4558,0.002988,0.715
+scgen_runs_L2_H800_Z100,task_057,IL-32-beta,B Naive,scGen,0.6007,0.001506,0.8041
+scgen_runs_L2_H800_Z100,task_057,IL-32-beta,B Naive,scGen_vs_real_ctrl,0.5513,0.001824,0.7703
+scgen_runs_L2_H800_Z100,task_057,IL-32-beta,B Naive,naive,0.4341,0.002825,0.6991
+scgen_runs_L2_H800_Z100,task_058,IL-32-beta,CD14 Mono,scGen,0.8034,0.03601,0.9121
+scgen_runs_L2_H800_Z100,task_058,IL-32-beta,CD14 Mono,scGen_vs_real_ctrl,0.64,0.036124,0.8528
+scgen_runs_L2_H800_Z100,task_058,IL-32-beta,CD14 Mono,naive,0.504,0.039487,0.6997
+scgen_runs_L2_H800_Z100,task_059,IL-32-beta,CD16 Mono,scGen,0.5731,0.017893,0.9036
+scgen_runs_L2_H800_Z100,task_059,IL-32-beta,CD16 Mono,scGen_vs_real_ctrl,0.4586,0.019223,0.8708
+scgen_runs_L2_H800_Z100,task_059,IL-32-beta,CD16 Mono,naive,0.5332,0.018381,0.7511
+scgen_runs_L2_H800_Z100,task_060,IL-32-beta,CD4 Memory,scGen,0.735,0.000973,0.882
+scgen_runs_L2_H800_Z100,task_060,IL-32-beta,CD4 Memory,scGen_vs_real_ctrl,0.6646,0.001198,0.827
+scgen_runs_L2_H800_Z100,task_060,IL-32-beta,CD4 Memory,naive,0.5896,0.001948,0.8441
+scgen_runs_L2_H800_Z100,task_061,IL-32-beta,CD4 Naive,scGen,0.7791,0.000883,0.9431
+scgen_runs_L2_H800_Z100,task_061,IL-32-beta,CD4 Naive,scGen_vs_real_ctrl,0.7076,0.001115,0.9178
+scgen_runs_L2_H800_Z100,task_061,IL-32-beta,CD4 Naive,naive,0.5711,0.002076,0.8427
+scgen_runs_L2_H800_Z100,task_062,IL-32-beta,CD8 Memory,scGen,0.4329,0.002879,0.7303
+scgen_runs_L2_H800_Z100,task_062,IL-32-beta,CD8 Memory,scGen_vs_real_ctrl,0.4833,0.002954,0.7462
+scgen_runs_L2_H800_Z100,task_062,IL-32-beta,CD8 Memory,naive,0.5841,0.002046,0.8254
+scgen_runs_L2_H800_Z100,task_063,IL-32-beta,CD8 Naive,scGen,0.4072,0.003046,0.7184
+scgen_runs_L2_H800_Z100,task_063,IL-32-beta,CD8 Naive,scGen_vs_real_ctrl,0.3935,0.003595,0.7006
+scgen_runs_L2_H800_Z100,task_063,IL-32-beta,CD8 Naive,naive,0.4302,0.00257,0.6778
+scgen_runs_L2_H800_Z100,task_064,IL-32-beta,MAIT,scGen,0.7288,0.001454,0.8916
+scgen_runs_L2_H800_Z100,task_064,IL-32-beta,MAIT,scGen_vs_real_ctrl,0.6737,0.001694,0.8718
+scgen_runs_L2_H800_Z100,task_064,IL-32-beta,MAIT,naive,0.61,0.002202,0.8422
+scgen_runs_L2_H800_Z100,task_065,IL-32-beta,NK,scGen,0.7847,0.001821,0.9408
+scgen_runs_L2_H800_Z100,task_065,IL-32-beta,NK,scGen_vs_real_ctrl,0.7487,0.001904,0.9326
+scgen_runs_L2_H800_Z100,task_065,IL-32-beta,NK,naive,0.6008,0.002841,0.841
+scgen_runs_L2_H800_Z100,task_066,IL-32-beta,NK CD56bright,scGen,0.7363,0.003189,0.8697
+scgen_runs_L2_H800_Z100,task_066,IL-32-beta,NK CD56bright,scGen_vs_real_ctrl,0.7005,0.003227,0.8688
+scgen_runs_L2_H800_Z100,task_066,IL-32-beta,NK CD56bright,naive,0.5251,0.004447,0.7214
+scgen_runs_L2_H800_Z100,task_067,IL-32-beta,NKT,scGen,0.7519,0.001434,0.9087
+scgen_runs_L2_H800_Z100,task_067,IL-32-beta,NKT,scGen_vs_real_ctrl,0.7163,0.001542,0.8774
+scgen_runs_L2_H800_Z100,task_067,IL-32-beta,NKT,naive,0.4193,0.003371,0.6958
+scgen_runs_L2_H800_Z100,task_068,IL-32-beta,Treg,scGen,0.5455,0.002082,0.7599
+scgen_runs_L2_H800_Z100,task_068,IL-32-beta,Treg,scGen_vs_real_ctrl,0.5276,0.002278,0.7703
+scgen_runs_L2_H800_Z100,task_068,IL-32-beta,Treg,naive,0.5174,0.002667,0.7581
+scgen_runs_L2_H800_Z100,task_069,IL-32-beta,cDC,scGen,0.8354,0.012717,0.939
+scgen_runs_L2_H800_Z100,task_069,IL-32-beta,cDC,scGen_vs_real_ctrl,0.7368,0.013195,0.9205
+scgen_runs_L2_H800_Z100,task_069,IL-32-beta,cDC,naive,0.5162,0.014395,0.6434
+scgen_runs_L2_H800_Z100,task_070,IL-4,B Intermediate/Memory,scGen,0.7734,0.002787,0.9077
+scgen_runs_L2_H800_Z100,task_070,IL-4,B Intermediate/Memory,scGen_vs_real_ctrl,0.6986,0.003117,0.8846
+scgen_runs_L2_H800_Z100,task_070,IL-4,B Intermediate/Memory,naive,0.4901,0.004639,0.685
+scgen_runs_L2_H800_Z100,task_071,IL-4,B Naive,scGen,0.8102,0.008084,0.9312
+scgen_runs_L2_H800_Z100,task_071,IL-4,B Naive,scGen_vs_real_ctrl,0.7831,0.0078,0.9299
+scgen_runs_L2_H800_Z100,task_071,IL-4,B Naive,naive,0.4088,0.011256,0.5716
+scgen_runs_L2_H800_Z100,task_072,IL-4,CD14 Mono,scGen,0.632,0.013807,0.7659
+scgen_runs_L2_H800_Z100,task_072,IL-4,CD14 Mono,scGen_vs_real_ctrl,0.5504,0.014551,0.7305
+scgen_runs_L2_H800_Z100,task_072,IL-4,CD14 Mono,naive,0.317,0.016918,0.5623
+scgen_runs_L2_H800_Z100,task_073,IL-4,CD16 Mono,scGen,0.6142,0.004664,0.8499
+scgen_runs_L2_H800_Z100,task_073,IL-4,CD16 Mono,scGen_vs_real_ctrl,0.4801,0.006065,0.7917
+scgen_runs_L2_H800_Z100,task_073,IL-4,CD16 Mono,naive,0.3564,0.006586,0.623
+scgen_runs_L2_H800_Z100,task_074,IL-4,CD4 Memory,scGen,0.8068,0.00481,0.913
+scgen_runs_L2_H800_Z100,task_074,IL-4,CD4 Memory,scGen_vs_real_ctrl,0.7589,0.00482,0.9081
+scgen_runs_L2_H800_Z100,task_074,IL-4,CD4 Memory,naive,0.6828,0.005513,0.8602
+scgen_runs_L2_H800_Z100,task_075,IL-4,CD4 Naive,scGen,0.8712,0.003129,0.9595
+scgen_runs_L2_H800_Z100,task_075,IL-4,CD4 Naive,scGen_vs_real_ctrl,0.8465,0.003107,0.9548
+scgen_runs_L2_H800_Z100,task_075,IL-4,CD4 Naive,naive,0.5653,0.006128,0.8496
+scgen_runs_L2_H800_Z100,task_076,IL-4,CD8 Memory,scGen,0.6654,0.000832,0.8542
+scgen_runs_L2_H800_Z100,task_076,IL-4,CD8 Memory,scGen_vs_real_ctrl,0.6797,0.001057,0.8501
+scgen_runs_L2_H800_Z100,task_076,IL-4,CD8 Memory,naive,0.5336,0.001877,0.8168
+scgen_runs_L2_H800_Z100,task_077,IL-4,CD8 Naive,scGen,0.8419,0.00452,0.9317
+scgen_runs_L2_H800_Z100,task_077,IL-4,CD8 Naive,scGen_vs_real_ctrl,0.8028,0.004534,0.9161
+scgen_runs_L2_H800_Z100,task_077,IL-4,CD8 Naive,naive,0.5916,0.006406,0.8505
+scgen_runs_L2_H800_Z100,task_078,IL-4,MAIT,scGen,0.7329,0.001193,0.874
+scgen_runs_L2_H800_Z100,task_078,IL-4,MAIT,scGen_vs_real_ctrl,0.713,0.00131,0.8723
+scgen_runs_L2_H800_Z100,task_078,IL-4,MAIT,naive,0.6814,0.001587,0.8939
+scgen_runs_L2_H800_Z100,task_079,IL-4,NK,scGen,0.7553,0.001672,0.9305
+scgen_runs_L2_H800_Z100,task_079,IL-4,NK,scGen_vs_real_ctrl,0.7066,0.001821,0.9182
+scgen_runs_L2_H800_Z100,task_079,IL-4,NK,naive,0.5169,0.00295,0.8018
+scgen_runs_L2_H800_Z100,task_080,IL-4,NK CD56bright,scGen,0.6425,0.005312,0.8236
+scgen_runs_L2_H800_Z100,task_080,IL-4,NK CD56bright,scGen_vs_real_ctrl,0.5684,0.005675,0.8039
+scgen_runs_L2_H800_Z100,task_080,IL-4,NK CD56bright,naive,0.5424,0.005826,0.75
+scgen_runs_L2_H800_Z100,task_081,IL-4,NKT,scGen,0.6228,0.000813,0.8352
+scgen_runs_L2_H800_Z100,task_081,IL-4,NKT,scGen_vs_real_ctrl,0.6385,0.00101,0.8629
+scgen_runs_L2_H800_Z100,task_081,IL-4,NKT,naive,0.4463,0.002174,0.7228
+scgen_runs_L2_H800_Z100,task_082,IL-4,Treg,scGen,0.6859,0.001222,0.9018
+scgen_runs_L2_H800_Z100,task_082,IL-4,Treg,scGen_vs_real_ctrl,0.6752,0.001267,0.901
+scgen_runs_L2_H800_Z100,task_082,IL-4,Treg,naive,0.6421,0.001704,0.8549
+scgen_runs_L2_H800_Z100,task_083,IL-4,cDC,scGen,0.5142,0.008858,0.7298
+scgen_runs_L2_H800_Z100,task_083,IL-4,cDC,scGen_vs_real_ctrl,0.4519,0.009249,0.6719
+scgen_runs_L2_H800_Z100,task_083,IL-4,cDC,naive,0.4581,0.008901,0.5439
+scgen_runs_L4_H800_Z100,task_000,IFN-beta,B Intermediate/Memory,scGen,0.7633,0.002712,0.892
+scgen_runs_L4_H800_Z100,task_000,IFN-beta,B Intermediate/Memory,scGen_vs_real_ctrl,0.7578,0.002914,0.8943
+scgen_runs_L4_H800_Z100,task_000,IFN-beta,B Intermediate/Memory,naive,0.623,0.003526,0.7423
+scgen_runs_L4_H800_Z100,task_001,IFN-beta,B Naive,scGen,0.8087,0.002392,0.9197
+scgen_runs_L4_H800_Z100,task_001,IFN-beta,B Naive,scGen_vs_real_ctrl,0.7946,0.002598,0.9107
+scgen_runs_L4_H800_Z100,task_001,IFN-beta,B Naive,naive,0.5578,0.005252,0.7318
+scgen_runs_L4_H800_Z100,task_002,IFN-beta,CD14 Mono,scGen,0.8382,0.013663,0.9231
+scgen_runs_L4_H800_Z100,task_002,IFN-beta,CD14 Mono,scGen_vs_real_ctrl,0.8345,0.01326,0.9338
+scgen_runs_L4_H800_Z100,task_002,IFN-beta,CD14 Mono,naive,0.5004,0.02337,0.5922
+scgen_runs_L4_H800_Z100,task_003,IFN-beta,CD16 Mono,scGen,0.8874,0.003688,0.9515
+scgen_runs_L4_H800_Z100,task_003,IFN-beta,CD16 Mono,scGen_vs_real_ctrl,0.8445,0.00466,0.9494
+scgen_runs_L4_H800_Z100,task_003,IFN-beta,CD16 Mono,naive,0.5745,0.009586,0.6508
+scgen_runs_L4_H800_Z100,task_004,IFN-beta,CD4 Memory,scGen,0.9268,0.001034,0.971
+scgen_runs_L4_H800_Z100,task_004,IFN-beta,CD4 Memory,scGen_vs_real_ctrl,0.9083,0.001191,0.9615
+scgen_runs_L4_H800_Z100,task_004,IFN-beta,CD4 Memory,naive,0.8306,0.002084,0.9311
+scgen_runs_L4_H800_Z100,task_005,IFN-beta,CD4 Naive,scGen,0.8935,0.001488,0.9701
+scgen_runs_L4_H800_Z100,task_005,IFN-beta,CD4 Naive,scGen_vs_real_ctrl,0.9049,0.001607,0.9656
+scgen_runs_L4_H800_Z100,task_005,IFN-beta,CD4 Naive,naive,0.7855,0.00225,0.8864
+scgen_runs_L4_H800_Z100,task_006,IFN-beta,CD8 Memory,scGen,0.9223,0.001441,0.9752
+scgen_runs_L4_H800_Z100,task_006,IFN-beta,CD8 Memory,scGen_vs_real_ctrl,0.9054,0.001391,0.969
+scgen_runs_L4_H800_Z100,task_006,IFN-beta,CD8 Memory,naive,0.8288,0.002379,0.9444
+scgen_runs_L4_H800_Z100,task_007,IFN-beta,CD8 Naive,scGen,0.9045,0.001227,0.9708
+scgen_runs_L4_H800_Z100,task_007,IFN-beta,CD8 Naive,scGen_vs_real_ctrl,0.8736,0.001461,0.9627
+scgen_runs_L4_H800_Z100,task_007,IFN-beta,CD8 Naive,naive,0.7623,0.002642,0.9157
+scgen_runs_L4_H800_Z100,task_008,IFN-beta,MAIT,scGen,0.8533,0.001713,0.9125
+scgen_runs_L4_H800_Z100,task_008,IFN-beta,MAIT,scGen_vs_real_ctrl,0.8143,0.002207,0.8841
+scgen_runs_L4_H800_Z100,task_008,IFN-beta,MAIT,naive,0.7856,0.00244,0.9126
+scgen_runs_L4_H800_Z100,task_009,IFN-beta,NK,scGen,0.8663,0.001775,0.9217
+scgen_runs_L4_H800_Z100,task_009,IFN-beta,NK,scGen_vs_real_ctrl,0.854,0.001891,0.9157
+scgen_runs_L4_H800_Z100,task_009,IFN-beta,NK,naive,0.752,0.00305,0.8575
+scgen_runs_L4_H800_Z100,task_010,IFN-beta,NK CD56bright,scGen,0.7896,0.002147,0.9066
+scgen_runs_L4_H800_Z100,task_010,IFN-beta,NK CD56bright,scGen_vs_real_ctrl,0.7622,0.002564,0.8927
+scgen_runs_L4_H800_Z100,task_010,IFN-beta,NK CD56bright,naive,0.7647,0.002162,0.8818
+scgen_runs_L4_H800_Z100,task_011,IFN-beta,NKT,scGen,0.8995,0.001209,0.9632
+scgen_runs_L4_H800_Z100,task_011,IFN-beta,NKT,scGen_vs_real_ctrl,0.8812,0.001658,0.9599
+scgen_runs_L4_H800_Z100,task_011,IFN-beta,NKT,naive,0.7688,0.002555,0.9072
+scgen_runs_L4_H800_Z100,task_012,IFN-beta,Treg,scGen,0.8217,0.002241,0.9188
+scgen_runs_L4_H800_Z100,task_012,IFN-beta,Treg,scGen_vs_real_ctrl,0.6714,0.006304,0.8567
+scgen_runs_L4_H800_Z100,task_012,IFN-beta,Treg,naive,0.7637,0.002831,0.8551
+scgen_runs_L4_H800_Z100,task_013,IFN-beta,cDC,scGen,0.8155,0.006534,0.9168
+scgen_runs_L4_H800_Z100,task_013,IFN-beta,cDC,scGen_vs_real_ctrl,0.7795,0.006582,0.9039
+scgen_runs_L4_H800_Z100,task_013,IFN-beta,cDC,naive,0.5452,0.010286,0.5947
+scgen_runs_L4_H800_Z100,task_014,IFN-gamma,B Intermediate/Memory,scGen,0.4315,0.001232,0.6711
+scgen_runs_L4_H800_Z100,task_014,IFN-gamma,B Intermediate/Memory,scGen_vs_real_ctrl,0.3832,0.00171,0.6471
+scgen_runs_L4_H800_Z100,task_014,IFN-gamma,B Intermediate/Memory,naive,0.4978,0.00152,0.7105
+scgen_runs_L4_H800_Z100,task_015,IFN-gamma,B Naive,scGen,0.6227,0.001161,0.8158
+scgen_runs_L4_H800_Z100,task_015,IFN-gamma,B Naive,scGen_vs_real_ctrl,0.6259,0.00148,0.8228
+scgen_runs_L4_H800_Z100,task_015,IFN-gamma,B Naive,naive,0.5049,0.001607,0.6787
+scgen_runs_L4_H800_Z100,task_016,IFN-gamma,CD14 Mono,scGen,0.7715,0.009479,0.9019
+scgen_runs_L4_H800_Z100,task_016,IFN-gamma,CD14 Mono,scGen_vs_real_ctrl,0.5508,0.010716,0.859
+scgen_runs_L4_H800_Z100,task_016,IFN-gamma,CD14 Mono,naive,0.4936,0.011645,0.6628
+scgen_runs_L4_H800_Z100,task_017,IFN-gamma,CD16 Mono,scGen,0.6965,0.004867,0.8576
+scgen_runs_L4_H800_Z100,task_017,IFN-gamma,CD16 Mono,scGen_vs_real_ctrl,0.7243,0.004597,0.8955
+scgen_runs_L4_H800_Z100,task_017,IFN-gamma,CD16 Mono,naive,0.4821,0.006255,0.6322
+scgen_runs_L4_H800_Z100,task_018,IFN-gamma,CD4 Memory,scGen,0.7841,0.001127,0.8975
+scgen_runs_L4_H800_Z100,task_018,IFN-gamma,CD4 Memory,scGen_vs_real_ctrl,0.7992,0.000986,0.9089
+scgen_runs_L4_H800_Z100,task_018,IFN-gamma,CD4 Memory,naive,0.7105,0.001335,0.9128
+scgen_runs_L4_H800_Z100,task_019,IFN-gamma,CD4 Naive,scGen,0.8545,0.001221,0.9482
+scgen_runs_L4_H800_Z100,task_019,IFN-gamma,CD4 Naive,scGen_vs_real_ctrl,0.7455,0.001337,0.9043
+scgen_runs_L4_H800_Z100,task_019,IFN-gamma,CD4 Naive,naive,0.6962,0.001456,0.8558
+scgen_runs_L4_H800_Z100,task_020,IFN-gamma,CD8 Memory,scGen,0.8217,0.000768,0.9297
+scgen_runs_L4_H800_Z100,task_020,IFN-gamma,CD8 Memory,scGen_vs_real_ctrl,0.8319,0.000665,0.9373
+scgen_runs_L4_H800_Z100,task_020,IFN-gamma,CD8 Memory,naive,0.6908,0.001102,0.8819
+scgen_runs_L4_H800_Z100,task_021,IFN-gamma,CD8 Naive,scGen,0.807,0.001058,0.9124
+scgen_runs_L4_H800_Z100,task_021,IFN-gamma,CD8 Naive,scGen_vs_real_ctrl,0.7309,0.001125,0.8891
+scgen_runs_L4_H800_Z100,task_021,IFN-gamma,CD8 Naive,naive,0.67,0.001374,0.9224
+scgen_runs_L4_H800_Z100,task_022,IFN-gamma,MAIT,scGen,0.7162,0.000911,0.8671
+scgen_runs_L4_H800_Z100,task_022,IFN-gamma,MAIT,scGen_vs_real_ctrl,0.6654,0.001254,0.8487
+scgen_runs_L4_H800_Z100,task_022,IFN-gamma,MAIT,naive,0.675,0.001114,0.8714
+scgen_runs_L4_H800_Z100,task_023,IFN-gamma,NK,scGen,0.7142,0.001505,0.7927
+scgen_runs_L4_H800_Z100,task_023,IFN-gamma,NK,scGen_vs_real_ctrl,0.6567,0.001709,0.7957
+scgen_runs_L4_H800_Z100,task_023,IFN-gamma,NK,naive,0.6612,0.001697,0.8119
+scgen_runs_L4_H800_Z100,task_024,IFN-gamma,NK CD56bright,scGen,0.4888,0.001547,0.6405
+scgen_runs_L4_H800_Z100,task_024,IFN-gamma,NK CD56bright,scGen_vs_real_ctrl,0.4175,0.001805,0.5782
+scgen_runs_L4_H800_Z100,task_024,IFN-gamma,NK CD56bright,naive,0.5703,0.001429,0.7104
+scgen_runs_L4_H800_Z100,task_025,IFN-gamma,NKT,scGen,0.6771,0.001008,0.8171
+scgen_runs_L4_H800_Z100,task_025,IFN-gamma,NKT,scGen_vs_real_ctrl,0.6472,0.001363,0.8408
+scgen_runs_L4_H800_Z100,task_025,IFN-gamma,NKT,naive,0.6504,0.001169,0.8397
+scgen_runs_L4_H800_Z100,task_026,IFN-gamma,Treg,scGen,0.7958,0.001159,0.8633
+scgen_runs_L4_H800_Z100,task_026,IFN-gamma,Treg,scGen_vs_real_ctrl,0.7526,0.001291,0.8481
+scgen_runs_L4_H800_Z100,task_026,IFN-gamma,Treg,naive,0.6613,0.001662,0.7771
+scgen_runs_L4_H800_Z100,task_027,IFN-gamma,cDC,scGen,0.664,0.007118,0.8248
+scgen_runs_L4_H800_Z100,task_027,IFN-gamma,cDC,scGen_vs_real_ctrl,0.573,0.007478,0.7942
+scgen_runs_L4_H800_Z100,task_027,IFN-gamma,cDC,naive,0.4612,0.008196,0.5475
+scgen_runs_L4_H800_Z100,task_028,IL-1-beta,B Intermediate/Memory,scGen,0.4464,0.001199,0.6354
+scgen_runs_L4_H800_Z100,task_028,IL-1-beta,B Intermediate/Memory,scGen_vs_real_ctrl,0.4665,0.001187,0.6717
+scgen_runs_L4_H800_Z100,task_028,IL-1-beta,B Intermediate/Memory,naive,0.5135,0.00123,0.7708
+scgen_runs_L4_H800_Z100,task_029,IL-1-beta,B Naive,scGen,0.5206,0.001285,0.5528
+scgen_runs_L4_H800_Z100,task_029,IL-1-beta,B Naive,scGen_vs_real_ctrl,0.5304,0.001295,0.6113
+scgen_runs_L4_H800_Z100,task_029,IL-1-beta,B Naive,naive,0.4689,0.001541,0.7924
+scgen_runs_L4_H800_Z100,task_030,IL-1-beta,CD14 Mono,scGen,0.5116,0.0049,0.7095
+scgen_runs_L4_H800_Z100,task_030,IL-1-beta,CD14 Mono,scGen_vs_real_ctrl,0.2007,0.006999,0.4504
+scgen_runs_L4_H800_Z100,task_030,IL-1-beta,CD14 Mono,naive,0.474,0.005032,0.5876
+scgen_runs_L4_H800_Z100,task_031,IL-1-beta,CD16 Mono,scGen,0.3551,0.003729,0.5991
+scgen_runs_L4_H800_Z100,task_031,IL-1-beta,CD16 Mono,scGen_vs_real_ctrl,0.1711,0.004734,0.4331
+scgen_runs_L4_H800_Z100,task_031,IL-1-beta,CD16 Mono,naive,0.4585,0.003368,0.5316
+scgen_runs_L4_H800_Z100,task_032,IL-1-beta,CD4 Memory,scGen,0.6259,0.001675,0.7628
+scgen_runs_L4_H800_Z100,task_032,IL-1-beta,CD4 Memory,scGen_vs_real_ctrl,0.5451,0.001849,0.699
+scgen_runs_L4_H800_Z100,task_032,IL-1-beta,CD4 Memory,naive,0.6929,0.001336,0.8619
+scgen_runs_L4_H800_Z100,task_033,IL-1-beta,CD4 Naive,scGen,0.7115,0.001103,0.8462
+scgen_runs_L4_H800_Z100,task_033,IL-1-beta,CD4 Naive,scGen_vs_real_ctrl,0.5654,0.001289,0.7476
+scgen_runs_L4_H800_Z100,task_033,IL-1-beta,CD4 Naive,naive,0.6755,0.00104,0.8856
+scgen_runs_L4_H800_Z100,task_034,IL-1-beta,CD8 Memory,scGen,0.6305,0.00087,0.722
+scgen_runs_L4_H800_Z100,task_034,IL-1-beta,CD8 Memory,scGen_vs_real_ctrl,0.6651,0.000864,0.7879
+scgen_runs_L4_H800_Z100,task_034,IL-1-beta,CD8 Memory,naive,0.6421,0.000914,0.9053
+scgen_runs_L4_H800_Z100,task_035,IL-1-beta,CD8 Naive,scGen,0.762,0.001064,0.8829
+scgen_runs_L4_H800_Z100,task_035,IL-1-beta,CD8 Naive,scGen_vs_real_ctrl,0.6364,0.00138,0.7974
+scgen_runs_L4_H800_Z100,task_035,IL-1-beta,CD8 Naive,naive,0.6761,0.00118,0.8832
+scgen_runs_L4_H800_Z100,task_036,IL-1-beta,MAIT,scGen,0.5694,0.00098,0.6967
+scgen_runs_L4_H800_Z100,task_036,IL-1-beta,MAIT,scGen_vs_real_ctrl,0.5793,0.001062,0.7253
+scgen_runs_L4_H800_Z100,task_036,IL-1-beta,MAIT,naive,0.6751,0.000826,0.9038
+scgen_runs_L4_H800_Z100,task_037,IL-1-beta,NK,scGen,0.6268,0.001111,0.7559
+scgen_runs_L4_H800_Z100,task_037,IL-1-beta,NK,scGen_vs_real_ctrl,0.493,0.001543,0.6447
+scgen_runs_L4_H800_Z100,task_037,IL-1-beta,NK,naive,0.6374,0.001109,0.8201
+scgen_runs_L4_H800_Z100,task_038,IL-1-beta,NK CD56bright,scGen,0.4399,0.001529,0.6556
+scgen_runs_L4_H800_Z100,task_038,IL-1-beta,NK CD56bright,scGen_vs_real_ctrl,0.3955,0.001827,0.6074
+scgen_runs_L4_H800_Z100,task_038,IL-1-beta,NK CD56bright,naive,0.55,0.001352,0.74
+scgen_runs_L4_H800_Z100,task_039,IL-1-beta,NKT,scGen,0.433,0.001161,0.5669
+scgen_runs_L4_H800_Z100,task_039,IL-1-beta,NKT,scGen_vs_real_ctrl,0.449,0.001443,0.6151
+scgen_runs_L4_H800_Z100,task_039,IL-1-beta,NKT,naive,0.5523,0.001083,0.7675
+scgen_runs_L4_H800_Z100,task_040,IL-1-beta,Treg,scGen,0.7649,0.001366,0.8791
+scgen_runs_L4_H800_Z100,task_040,IL-1-beta,Treg,scGen_vs_real_ctrl,0.6621,0.00156,0.843
+scgen_runs_L4_H800_Z100,task_040,IL-1-beta,Treg,naive,0.6595,0.001398,0.8157
+scgen_runs_L4_H800_Z100,task_041,IL-1-beta,cDC,scGen,0.3796,0.005442,0.5663
+scgen_runs_L4_H800_Z100,task_041,IL-1-beta,cDC,scGen_vs_real_ctrl,0.4048,0.005406,0.5773
+scgen_runs_L4_H800_Z100,task_041,IL-1-beta,cDC,naive,0.4469,0.005093,0.6132
+scgen_runs_L4_H800_Z100,task_042,IL-15,B Intermediate/Memory,scGen,0.7716,0.001152,0.9175
+scgen_runs_L4_H800_Z100,task_042,IL-15,B Intermediate/Memory,scGen_vs_real_ctrl,0.7953,0.001096,0.932
+scgen_runs_L4_H800_Z100,task_042,IL-15,B Intermediate/Memory,naive,0.616,0.002729,0.8223
+scgen_runs_L4_H800_Z100,task_043,IL-15,B Naive,scGen,0.7771,0.002353,0.9232
+scgen_runs_L4_H800_Z100,task_043,IL-15,B Naive,scGen_vs_real_ctrl,0.7546,0.002866,0.9115
+scgen_runs_L4_H800_Z100,task_043,IL-15,B Naive,naive,0.55,0.003565,0.8406
+scgen_runs_L4_H800_Z100,task_044,IL-15,CD14 Mono,scGen,0.8419,0.00457,0.9366
+scgen_runs_L4_H800_Z100,task_044,IL-15,CD14 Mono,scGen_vs_real_ctrl,0.8138,0.004862,0.935
+scgen_runs_L4_H800_Z100,task_044,IL-15,CD14 Mono,naive,0.4745,0.010758,0.5407
+scgen_runs_L4_H800_Z100,task_045,IL-15,CD16 Mono,scGen,0.783,0.005575,0.9028
+scgen_runs_L4_H800_Z100,task_045,IL-15,CD16 Mono,scGen_vs_real_ctrl,0.6243,0.006388,0.7944
+scgen_runs_L4_H800_Z100,task_045,IL-15,CD16 Mono,naive,0.4559,0.008418,0.506
+scgen_runs_L4_H800_Z100,task_046,IL-15,CD4 Memory,scGen,0.8615,0.001345,0.9261
+scgen_runs_L4_H800_Z100,task_046,IL-15,CD4 Memory,scGen_vs_real_ctrl,0.8813,0.001177,0.9365
+scgen_runs_L4_H800_Z100,task_046,IL-15,CD4 Memory,naive,0.7708,0.002165,0.8993
+scgen_runs_L4_H800_Z100,task_047,IL-15,CD4 Naive,scGen,0.8536,0.001899,0.936
+scgen_runs_L4_H800_Z100,task_047,IL-15,CD4 Naive,scGen_vs_real_ctrl,0.7962,0.001729,0.8875
+scgen_runs_L4_H800_Z100,task_047,IL-15,CD4 Naive,naive,0.699,0.002634,0.8428
+scgen_runs_L4_H800_Z100,task_048,IL-15,CD8 Memory,scGen,0.9265,0.001814,0.9645
+scgen_runs_L4_H800_Z100,task_048,IL-15,CD8 Memory,scGen_vs_real_ctrl,0.9321,0.001517,0.9656
+scgen_runs_L4_H800_Z100,task_048,IL-15,CD8 Memory,naive,0.8321,0.00326,0.9168
+scgen_runs_L4_H800_Z100,task_049,IL-15,CD8 Naive,scGen,0.8309,0.003935,0.9115
+scgen_runs_L4_H800_Z100,task_049,IL-15,CD8 Naive,scGen_vs_real_ctrl,0.731,0.003554,0.853
+scgen_runs_L4_H800_Z100,task_049,IL-15,CD8 Naive,naive,0.7187,0.003501,0.8527
+scgen_runs_L4_H800_Z100,task_050,IL-15,MAIT,scGen,0.8972,0.001486,0.9518
+scgen_runs_L4_H800_Z100,task_050,IL-15,MAIT,scGen_vs_real_ctrl,0.8936,0.001554,0.956
+scgen_runs_L4_H800_Z100,task_050,IL-15,MAIT,naive,0.8075,0.002723,0.8825
+scgen_runs_L4_H800_Z100,task_051,IL-15,NK,scGen,0.9244,0.001922,0.9495
+scgen_runs_L4_H800_Z100,task_051,IL-15,NK,scGen_vs_real_ctrl,0.9097,0.001904,0.9459
+scgen_runs_L4_H800_Z100,task_051,IL-15,NK,naive,0.731,0.005123,0.8024
+scgen_runs_L4_H800_Z100,task_052,IL-15,NK CD56bright,scGen,0.7599,0.008804,0.8667
+scgen_runs_L4_H800_Z100,task_052,IL-15,NK CD56bright,scGen_vs_real_ctrl,0.7651,0.008338,0.8812
+scgen_runs_L4_H800_Z100,task_052,IL-15,NK CD56bright,naive,0.5707,0.011369,0.7016
+scgen_runs_L4_H800_Z100,task_053,IL-15,NKT,scGen,0.8629,0.002858,0.9391
+scgen_runs_L4_H800_Z100,task_053,IL-15,NKT,scGen_vs_real_ctrl,0.7965,0.003363,0.8919
+scgen_runs_L4_H800_Z100,task_053,IL-15,NKT,naive,0.7596,0.003796,0.7957
+scgen_runs_L4_H800_Z100,task_054,IL-15,Treg,scGen,0.7724,0.001716,0.8905
+scgen_runs_L4_H800_Z100,task_054,IL-15,Treg,scGen_vs_real_ctrl,0.7703,0.001931,0.8819
+scgen_runs_L4_H800_Z100,task_054,IL-15,Treg,naive,0.6577,0.002739,0.8182
+scgen_runs_L4_H800_Z100,task_055,IL-15,cDC,scGen,0.8386,0.003674,0.9329
+scgen_runs_L4_H800_Z100,task_055,IL-15,cDC,scGen_vs_real_ctrl,0.8055,0.003759,0.9199
+scgen_runs_L4_H800_Z100,task_055,IL-15,cDC,naive,0.5606,0.006876,0.6459
+scgen_runs_L4_H800_Z100,task_056,IL-32-beta,B Intermediate/Memory,scGen,0.3254,0.002938,0.5625
+scgen_runs_L4_H800_Z100,task_056,IL-32-beta,B Intermediate/Memory,scGen_vs_real_ctrl,0.297,0.003361,0.5598
+scgen_runs_L4_H800_Z100,task_056,IL-32-beta,B Intermediate/Memory,naive,0.4558,0.002988,0.715
+scgen_runs_L4_H800_Z100,task_057,IL-32-beta,B Naive,scGen,0.6047,0.001482,0.8071
+scgen_runs_L4_H800_Z100,task_057,IL-32-beta,B Naive,scGen_vs_real_ctrl,0.6176,0.001526,0.8195
+scgen_runs_L4_H800_Z100,task_057,IL-32-beta,B Naive,naive,0.4341,0.002825,0.6991
+scgen_runs_L4_H800_Z100,task_058,IL-32-beta,CD14 Mono,scGen,0.7688,0.034685,0.9131
+scgen_runs_L4_H800_Z100,task_058,IL-32-beta,CD14 Mono,scGen_vs_real_ctrl,0.6945,0.034101,0.9248
+scgen_runs_L4_H800_Z100,task_058,IL-32-beta,CD14 Mono,naive,0.504,0.039487,0.6997
+scgen_runs_L4_H800_Z100,task_059,IL-32-beta,CD16 Mono,scGen,0.6275,0.016642,0.8544
+scgen_runs_L4_H800_Z100,task_059,IL-32-beta,CD16 Mono,scGen_vs_real_ctrl,0.4455,0.019249,0.7579
+scgen_runs_L4_H800_Z100,task_059,IL-32-beta,CD16 Mono,naive,0.5332,0.018381,0.7511
+scgen_runs_L4_H800_Z100,task_060,IL-32-beta,CD4 Memory,scGen,0.6255,0.001264,0.7679
+scgen_runs_L4_H800_Z100,task_060,IL-32-beta,CD4 Memory,scGen_vs_real_ctrl,0.6657,0.001184,0.7955
+scgen_runs_L4_H800_Z100,task_060,IL-32-beta,CD4 Memory,naive,0.5896,0.001948,0.8441
+scgen_runs_L4_H800_Z100,task_061,IL-32-beta,CD4 Naive,scGen,0.6953,0.001143,0.9038
+scgen_runs_L4_H800_Z100,task_061,IL-32-beta,CD4 Naive,scGen_vs_real_ctrl,0.6842,0.001455,0.9042
+scgen_runs_L4_H800_Z100,task_061,IL-32-beta,CD4 Naive,naive,0.5711,0.002076,0.8427
+scgen_runs_L4_H800_Z100,task_062,IL-32-beta,CD8 Memory,scGen,0.7193,0.001137,0.8869
+scgen_runs_L4_H800_Z100,task_062,IL-32-beta,CD8 Memory,scGen_vs_real_ctrl,0.7299,0.001236,0.8708
+scgen_runs_L4_H800_Z100,task_062,IL-32-beta,CD8 Memory,naive,0.5841,0.002046,0.8254
+scgen_runs_L4_H800_Z100,task_063,IL-32-beta,CD8 Naive,scGen,0.5785,0.001302,0.78
+scgen_runs_L4_H800_Z100,task_063,IL-32-beta,CD8 Naive,scGen_vs_real_ctrl,0.5186,0.001769,0.768
+scgen_runs_L4_H800_Z100,task_063,IL-32-beta,CD8 Naive,naive,0.4302,0.00257,0.6778
+scgen_runs_L4_H800_Z100,task_064,IL-32-beta,MAIT,scGen,0.7663,0.001291,0.8981
+scgen_runs_L4_H800_Z100,task_064,IL-32-beta,MAIT,scGen_vs_real_ctrl,0.7196,0.001471,0.8737
+scgen_runs_L4_H800_Z100,task_064,IL-32-beta,MAIT,naive,0.61,0.002202,0.8422
+scgen_runs_L4_H800_Z100,task_065,IL-32-beta,NK,scGen,0.775,0.001731,0.9292
+scgen_runs_L4_H800_Z100,task_065,IL-32-beta,NK,scGen_vs_real_ctrl,0.7427,0.001925,0.9225
+scgen_runs_L4_H800_Z100,task_065,IL-32-beta,NK,naive,0.6008,0.002841,0.841
+scgen_runs_L4_H800_Z100,task_066,IL-32-beta,NK CD56bright,scGen,0.631,0.003889,0.7845
+scgen_runs_L4_H800_Z100,task_066,IL-32-beta,NK CD56bright,scGen_vs_real_ctrl,0.5794,0.004047,0.7658
+scgen_runs_L4_H800_Z100,task_066,IL-32-beta,NK CD56bright,naive,0.5251,0.004447,0.7214
+scgen_runs_L4_H800_Z100,task_067,IL-32-beta,NKT,scGen,0.7627,0.001325,0.912
+scgen_runs_L4_H800_Z100,task_067,IL-32-beta,NKT,scGen_vs_real_ctrl,0.7801,0.001242,0.9065
+scgen_runs_L4_H800_Z100,task_067,IL-32-beta,NKT,naive,0.4193,0.003371,0.6958
+scgen_runs_L4_H800_Z100,task_068,IL-32-beta,Treg,scGen,0.4204,0.0031,0.6374
+scgen_runs_L4_H800_Z100,task_068,IL-32-beta,Treg,scGen_vs_real_ctrl,0.3798,0.00357,0.5881
+scgen_runs_L4_H800_Z100,task_068,IL-32-beta,Treg,naive,0.5174,0.002667,0.7581
+scgen_runs_L4_H800_Z100,task_069,IL-32-beta,cDC,scGen,0.7118,0.012322,0.8711
+scgen_runs_L4_H800_Z100,task_069,IL-32-beta,cDC,scGen_vs_real_ctrl,0.7303,0.011517,0.8835
+scgen_runs_L4_H800_Z100,task_069,IL-32-beta,cDC,naive,0.5162,0.014395,0.6434
+scgen_runs_L4_H800_Z100,task_070,IL-4,B Intermediate/Memory,scGen,0.8298,0.002102,0.9289
+scgen_runs_L4_H800_Z100,task_070,IL-4,B Intermediate/Memory,scGen_vs_real_ctrl,0.8096,0.002138,0.9278
+scgen_runs_L4_H800_Z100,task_070,IL-4,B Intermediate/Memory,naive,0.4901,0.004639,0.685
+scgen_runs_L4_H800_Z100,task_071,IL-4,B Naive,scGen,0.7526,0.009214,0.9005
+scgen_runs_L4_H800_Z100,task_071,IL-4,B Naive,scGen_vs_real_ctrl,0.7415,0.009246,0.8988
+scgen_runs_L4_H800_Z100,task_071,IL-4,B Naive,naive,0.4088,0.011256,0.5716
+scgen_runs_L4_H800_Z100,task_072,IL-4,CD14 Mono,scGen,0.6713,0.013025,0.8592
+scgen_runs_L4_H800_Z100,task_072,IL-4,CD14 Mono,scGen_vs_real_ctrl,0.6167,0.013576,0.8334
+scgen_runs_L4_H800_Z100,task_072,IL-4,CD14 Mono,naive,0.317,0.016918,0.5623
+scgen_runs_L4_H800_Z100,task_073,IL-4,CD16 Mono,scGen,0.6971,0.003887,0.8745
+scgen_runs_L4_H800_Z100,task_073,IL-4,CD16 Mono,scGen_vs_real_ctrl,0.6408,0.00428,0.8603
+scgen_runs_L4_H800_Z100,task_073,IL-4,CD16 Mono,naive,0.3564,0.006586,0.623
+scgen_runs_L4_H800_Z100,task_074,IL-4,CD4 Memory,scGen,0.7797,0.005274,0.9252
+scgen_runs_L4_H800_Z100,task_074,IL-4,CD4 Memory,scGen_vs_real_ctrl,0.7682,0.004813,0.9308
+scgen_runs_L4_H800_Z100,task_074,IL-4,CD4 Memory,naive,0.6828,0.005513,0.8602
+scgen_runs_L4_H800_Z100,task_075,IL-4,CD4 Naive,scGen,0.7769,0.005294,0.9188
+scgen_runs_L4_H800_Z100,task_075,IL-4,CD4 Naive,scGen_vs_real_ctrl,0.7076,0.005366,0.8862
+scgen_runs_L4_H800_Z100,task_075,IL-4,CD4 Naive,naive,0.5653,0.006128,0.8496
+scgen_runs_L4_H800_Z100,task_076,IL-4,CD8 Memory,scGen,0.5679,0.001193,0.7949
+scgen_runs_L4_H800_Z100,task_076,IL-4,CD8 Memory,scGen_vs_real_ctrl,0.5937,0.001567,0.8051
+scgen_runs_L4_H800_Z100,task_076,IL-4,CD8 Memory,naive,0.5336,0.001877,0.8168
+scgen_runs_L4_H800_Z100,task_077,IL-4,CD8 Naive,scGen,0.9074,0.003248,0.971
+scgen_runs_L4_H800_Z100,task_077,IL-4,CD8 Naive,scGen_vs_real_ctrl,0.8949,0.003061,0.9668
+scgen_runs_L4_H800_Z100,task_077,IL-4,CD8 Naive,naive,0.5916,0.006406,0.8505
+scgen_runs_L4_H800_Z100,task_078,IL-4,MAIT,scGen,0.709,0.001278,0.8562
+scgen_runs_L4_H800_Z100,task_078,IL-4,MAIT,scGen_vs_real_ctrl,0.5855,0.002104,0.79
+scgen_runs_L4_H800_Z100,task_078,IL-4,MAIT,naive,0.6814,0.001587,0.8939
+scgen_runs_L4_H800_Z100,task_079,IL-4,NK,scGen,0.4811,0.006308,0.7567
+scgen_runs_L4_H800_Z100,task_079,IL-4,NK,scGen_vs_real_ctrl,0.4793,0.007807,0.7571
+scgen_runs_L4_H800_Z100,task_079,IL-4,NK,naive,0.5169,0.00295,0.8018
+scgen_runs_L4_H800_Z100,task_080,IL-4,NK CD56bright,scGen,0.6289,0.005364,0.7981
+scgen_runs_L4_H800_Z100,task_080,IL-4,NK CD56bright,scGen_vs_real_ctrl,0.5679,0.005612,0.7725
+scgen_runs_L4_H800_Z100,task_080,IL-4,NK CD56bright,naive,0.5424,0.005826,0.75
+scgen_runs_L4_H800_Z100,task_081,IL-4,NKT,scGen,0.6253,0.000855,0.8637
+scgen_runs_L4_H800_Z100,task_081,IL-4,NKT,scGen_vs_real_ctrl,0.6411,0.001061,0.8512
+scgen_runs_L4_H800_Z100,task_081,IL-4,NKT,naive,0.4463,0.002174,0.7228
+scgen_runs_L4_H800_Z100,task_082,IL-4,Treg,scGen,0.3852,0.004,0.6539
+scgen_runs_L4_H800_Z100,task_082,IL-4,Treg,scGen_vs_real_ctrl,0.4199,0.00374,0.6885
+scgen_runs_L4_H800_Z100,task_082,IL-4,Treg,naive,0.6421,0.001704,0.8549
+scgen_runs_L4_H800_Z100,task_083,IL-4,cDC,scGen,0.2585,0.010665,0.4372
+scgen_runs_L4_H800_Z100,task_083,IL-4,cDC,scGen_vs_real_ctrl,0.2568,0.010959,0.4461
+scgen_runs_L4_H800_Z100,task_083,IL-4,cDC,naive,0.4581,0.008901,0.5439

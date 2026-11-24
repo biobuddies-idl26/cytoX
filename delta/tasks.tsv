@@ -1,0 +1,84 @@
+IFN-beta	B Intermediate/Memory
+IFN-beta	B Naive
+IFN-beta	CD14 Mono
+IFN-beta	CD16 Mono
+IFN-beta	CD4 Memory
+IFN-beta	CD4 Naive
+IFN-beta	CD8 Memory
+IFN-beta	CD8 Naive
+IFN-beta	MAIT
+IFN-beta	NK
+IFN-beta	NK CD56bright
+IFN-beta	NKT
+IFN-beta	Treg
+IFN-beta	cDC
+IFN-gamma	B Intermediate/Memory
+IFN-gamma	B Naive
+IFN-gamma	CD14 Mono
+IFN-gamma	CD16 Mono
+IFN-gamma	CD4 Memory
+IFN-gamma	CD4 Naive
+IFN-gamma	CD8 Memory
+IFN-gamma	CD8 Naive
+IFN-gamma	MAIT
+IFN-gamma	NK
+IFN-gamma	NK CD56bright
+IFN-gamma	NKT
+IFN-gamma	Treg
+IFN-gamma	cDC
+IL-1-beta	B Intermediate/Memory
+IL-1-beta	B Naive
+IL-1-beta	CD14 Mono
+IL-1-beta	CD16 Mono
+IL-1-beta	CD4 Memory
+IL-1-beta	CD4 Naive
+IL-1-beta	CD8 Memory
+IL-1-beta	CD8 Naive
+IL-1-beta	MAIT
+IL-1-beta	NK
+IL-1-beta	NK CD56bright
+IL-1-beta	NKT
+IL-1-beta	Treg
+IL-1-beta	cDC
+IL-15	B Intermediate/Memory
+IL-15	B Naive
+IL-15	CD14 Mono
+IL-15	CD16 Mono
+IL-15	CD4 Memory
+IL-15	CD4 Naive
+IL-15	CD8 Memory
+IL-15	CD8 Naive
+IL-15	MAIT
+IL-15	NK
+IL-15	NK CD56bright
+IL-15	NKT
+IL-15	Treg
+IL-15	cDC
+IL-32-beta	B Intermediate/Memory
+IL-32-beta	B Naive
+IL-32-beta	CD14 Mono
+IL-32-beta	CD16 Mono
+IL-32-beta	CD4 Memory
+IL-32-beta	CD4 Naive
+IL-32-beta	CD8 Memory
+IL-32-beta	CD8 Naive
+IL-32-beta	MAIT
+IL-32-beta	NK
+IL-32-beta	NK CD56bright
+IL-32-beta	NKT
+IL-32-beta	Treg
+IL-32-beta	cDC
+IL-4	B Intermediate/Memory
+IL-4	B Naive
+IL-4	CD14 Mono
+IL-4	CD16 Mono
+IL-4	CD4 Memory
+IL-4	CD4 Naive
+IL-4	CD8 Memory
+IL-4	CD8 Naive
+IL-4	MAIT
+IL-4	NK
+IL-4	NK CD56bright
+IL-4	NKT
+IL-4	Treg
+IL-4	cDC
