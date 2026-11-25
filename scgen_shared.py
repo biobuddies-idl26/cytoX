@@ -11,6 +11,9 @@ import scgen
 import torch
 import wandb
 from scgen._scgenvae import SCGENVAE
+import scvi 
+
+scvi.settings.seed = 0  # seeds torch, numpy and python random
 
 # newer scvi-tools reads "qzm"/"qzv" from inference(), scgen still returns "qz_m"/"qz_v",
 # which crashes predict(). alias the keys.
@@ -41,7 +44,11 @@ p.add_argument("--n-hidden", type=int, default=800)
 p.add_argument("--n-latent", type=int, default=100)
 p.add_argument("--wandb-project", default=None, help="log to W&B if set")
 p.add_argument("--wandb-group", default=None, help="e.g. L4, groups all tasks of one config")
+p.add_argument("--seed", type=int, default=0)
 args = p.parse_args()
+
+# seeds torch, numpy and python random (init, train/val split, batches, dropout)
+scvi.settings.seed = args.seed
 
 CYTOKINES = list(dict.fromkeys(args.cytokines))
 if "PBS" in CYTOKINES:
