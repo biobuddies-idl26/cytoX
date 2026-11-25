@@ -146,8 +146,6 @@ def extract_training_metrics(model, train_result=None) -> dict:
         "elbo_validation": ("elbo_validation",),
         "reconstruction_loss_train": ("reconstruction_loss_train",),
         "reconstruction_loss_validation": ("reconstruction_loss_validation",),
-        "kl_global_train": ("kl_global_train",),
-        "kl_global_validation": ("kl_global_validation",),
         "kl_local_train": ("kl_local_train",),
         "kl_local_validation": ("kl_local_validation",),
     }
@@ -161,6 +159,55 @@ def extract_training_metrics(model, train_result=None) -> dict:
                     break
     return extracted
 
+
+
+def _history_series(value):
+    """Convert a scvi/scGen history value to a 1-D numeric Series."""
+    if isinstance(value, pd.DataFrame):
+        if value.empty:
+            return pd.Series(dtype=float)
+        numeric = value.select_dtypes(include=[np.number])
+        if numeric.empty:
+            return pd.Series(dtype=float)
+        # scvi-tools normally stores one metric column per history entry.
+        values = numeric.iloc[:, -1]
+    elif isinstance(value, pd.Series):
+        values = value
+    else:
+        try:
+            arr = np.asarray(value).reshape(-1)
+        except Exception:
+            return pd.Series(dtype=float)
+        values = pd.Series(arr)
+    return pd.to_numeric(values, errors="coerce").reset_index(drop=True)
+
+
+def extract_training_history(model, train_result=None) -> dict:
+    """Return all available epoch-level training metrics, not just final values."""
+    history = getattr(model, "history", None)
+    if not isinstance(history, dict) or not history:
+        history = train_result if isinstance(train_result, dict) else {}
+    aliases = {
+        "train_loss": ("train_loss", "train_loss_epoch", "loss_train"),
+        "validation_loss": ("validation_loss", "validation_loss_epoch", "loss_validation"),
+        "elbo_train": ("elbo_train",),
+        "elbo_validation": ("elbo_validation",),
+        "reconstruction_loss_train": ("reconstruction_loss_train",),
+        "reconstruction_loss_validation": ("reconstruction_loss_validation",),
+        "kl_global_train": ("kl_global_train",),
+        "kl_global_validation": ("kl_global_validation",),
+        "kl_local_train": ("kl_local_train",),
+        "kl_local_validation": ("kl_local_validation",),
+    }
+    output = {}
+    for output_name, candidates in aliases.items():
+        for key in candidates:
+            if key in history:
+                series = _history_series(history[key])
+                if series.notna().any():
+                    output[output_name] = series
+                    break
+    return output
 
 def import_scgen():
     """Import the same external scGen package/API used by scgen_baseline.py."""
@@ -325,15 +372,77 @@ def init_wandb(config: dict, run_name: str, args, tags=None):
         raise RuntimeError(
             "wandb is not installed. Install it with 'pip install wandb' or pass --no-wandb."
         ) from exc
-    return wandb.init(
+    run = wandb.init(
         project=args.wandb_project,
         entity=args.wandb_entity,
         mode=args.wandb_mode,
         name=run_name,
         config=config,
         tags=tags or [],
-        reinit=True,
+        reinit="finish_previous",
     )
+    return run
+
+
+try:  # newer scvi-tools uses the `lightning` package, older ones `pytorch_lightning`
+    from lightning.pytorch.callbacks import Callback
+except ImportError:  # pragma: no cover
+    from pytorch_lightning.callbacks import Callback
+
+# Lightning metric names -> names used in W&B.
+CURVE_RENAME = {
+    "train_loss_epoch": "train_loss",
+}
+# Only these per-epoch curves are logged (they populate the default Charts).
+CURVE_METRICS = (
+    "train_loss", "validation_loss",
+    "reconstruction_loss_train", "reconstruction_loss_validation",
+    "elbo_train", "elbo_validation",
+    "kl_local_train", "kl_local_validation",
+    "kl_global_train", "kl_global_validation",
+)
+
+
+class WandbEpochLogger(Callback):
+    """Log one point per training epoch, live, straight from Lightning.
+
+    Works with run=None (W&B disabled): it still records the last epoch's
+    values in ``self.last`` so they can be written to metrics.json.
+    """
+
+    def __init__(self, run, logger: logging.Logger):
+        # Prefixed names so they can never collide with Lightning's own
+        # Callback attributes/methods (newer versions define Callback.log).
+        self._wb_run = run
+        self._py_logger = logger
+        self.n_logged = 0
+        self.last: dict = {}
+        self._printed_keys = False
+
+    def on_train_epoch_end(self, trainer, pl_module):
+        values = {}
+        for key, val in trainer.callback_metrics.items():
+            if key.endswith("_step"):  # skip per-step duplicates
+                continue
+            name = CURVE_RENAME.get(key, key)
+            if name not in CURVE_METRICS:
+                continue
+            try:
+                values[name] = float(val)
+            except (TypeError, ValueError):
+                continue
+        if not self._printed_keys:
+            self._py_logger.info("callback_metrics keys at first epoch end: %s",
+                          sorted(trainer.callback_metrics.keys()))
+            self._printed_keys = True
+        if not values:
+            return
+        self.last = values
+        self.n_logged += 1
+        if self._wb_run is not None:
+            # Plain metric names + step=epoch -> lands in the default "Charts"
+            # section with the same names as earlier runs.
+            self._wb_run.log(values, step=trainer.current_epoch)
 
 
 def run_one(pb: ad.AnnData, cytokine: str, holdout: str, strategy: str,
@@ -366,33 +475,6 @@ def run_one(pb: ad.AnnData, cytokine: str, holdout: str, strategy: str,
 
     # Batch size must be smaller than the training set for tiny pooled runs.
     batch_size = min(args.batch_size, max(2, train.n_obs - 1))
-    logger.info("[4/6] Training scGen: %d profiles, batch_size=%d, epochs=%d",
-                train.n_obs, batch_size, args.epochs)
-    scgen.SCGEN.setup_anndata(train, batch_key="condition", labels_key="cell_type")
-    model = scgen.SCGEN(train)
-    train_result = model.train(max_epochs=args.epochs, batch_size=batch_size,
-                               early_stopping=True,
-                               early_stopping_patience=args.patience)
-    training_metrics = extract_training_metrics(model, train_result)
-    if training_metrics:
-        logger.info("Available training metrics: %s", training_metrics)
-    else:
-        logger.info("No compatible training-history metrics exposed by this scGen version")
-
-    logger.info("[5/6] Predicting held-out stimulated profiles for %s", holdout)
-    pred, _ = model.predict(ctrl_key="control", stim_key="stimulated",
-                            celltype_to_predict=holdout)
-    if pred is None or pred.n_obs == 0:
-        raise RuntimeError("scGen returned an empty prediction")
-
-    metrics, arrays = evaluate_prediction(pb, pred, cytokine, holdout, strategy)
-
-    logger.info("[6/6] Results | %s | holdout=%s | strategy=%s | min_cells=%d",
-                cytokine, holdout, strategy, min_cells)
-    logger.info("scGen: r=%.4f mse=%.6f top100_r=%.4f sign=%.3f | mode=%s | n_eval_donors=%s",
-                metrics["pearson_all"], metrics["mse"], metrics["pearson_top100"],
-                metrics["sign_agreement"], metrics["evaluation_mode"], metrics["n_eval_donors"])
-
     n_donors = (int(pb.obs.loc[pb.obs["donor"].astype(str) != "POOLED", "donor"].nunique())
                 if strategy != "pooled_donor" else int(pb.obs["n_donors"].max()))
     n_train_source_cells = int(train.obs["n_cells"].sum())
@@ -419,30 +501,80 @@ def run_one(pb: ad.AnnData, cytokine: str, holdout: str, strategy: str,
     # Keep the established cytokine | holdout naming convention and append
     # strategy/threshold so configurations remain distinguishable.
     run_name = f"{cytokine} | {holdout} | {safe_name(strategy)}_n{min_cells}"
+
+    # W&B run is created BEFORE training so curves are logged live, per epoch.
     wandb_run = init_wandb(
         run_config, run_name, args,
         tags=["pseudobulk", strategy, f"min_cells_{min_cells}"],
     )
-    if wandb_run is not None:
-        import wandb
-        wandb_metrics = {
-            "scGen/r_all": metrics["pearson_all"],
-            "scGen/r_top100": metrics["pearson_top100"],
-            "scGen/mse": metrics["mse"],
-            "scGen/sign_agreement": metrics["sign_agreement"],
-            "data/n_profiles": pb.n_obs,
-            "data/n_train_profiles": train.n_obs,
-            "data/n_heldout_stim_profiles": heldout_stim_n,
-            "data/n_eval_donors": metrics["n_eval_donors"],
-            "data/n_donors": n_donors,
-            "data/n_train_source_cells": n_train_source_cells,
-            "data/median_cells_per_pseudobulk": float(pb.obs["n_cells"].median()),
-            "data/min_cells_observed": int(pb.obs["n_cells"].min()),
-            "data/max_cells_observed": int(pb.obs["n_cells"].max()),
+    epoch_logger = WandbEpochLogger(wandb_run, logger)
+    try:
+        logger.info("[4/6] Training scGen: %d profiles, batch_size=%d, epochs=%d",
+                    train.n_obs, batch_size, args.epochs)
+        scgen.SCGEN.setup_anndata(train, batch_key="condition", labels_key="cell_type")
+        model = scgen.SCGEN(train)
+        train_result = model.train(max_epochs=args.epochs, batch_size=batch_size,
+                                   early_stopping=True,
+                                   early_stopping_patience=args.patience,
+                                   callbacks=[epoch_logger])
+        logger.info("Logged %d epoch(s) of training curves", epoch_logger.n_logged)
+
+        # model.history is unreliable on newer scvi-tools; keep it only as a
+        # fallback when the live callback captured nothing.
+        training_history = extract_training_history(model, train_result)
+        if wandb_run is not None and epoch_logger.n_logged == 0 and training_history:
+            logger.warning("Callback logged nothing; replaying model.history instead")
+            n_hist = max(len(series) for series in training_history.values())
+            for epoch in range(n_hist):
+                row = {key: float(series.iloc[epoch])
+                       for key, series in training_history.items()
+                       if epoch < len(series) and pd.notna(series.iloc[epoch])}
+                if row:
+                    wandb_run.log(row, step=epoch)
+        training_metrics = {
+            key: value.dropna().iloc[-1].item()
+            for key, value in training_history.items() if value.notna().any()
         }
-        wandb_metrics.update(training_metrics)
-        wandb.log(wandb_metrics)
-        wandb_run.finish()
+        if not training_metrics and epoch_logger.last:
+            training_metrics = dict(epoch_logger.last)
+        if epoch_logger.n_logged == 0 and not training_history:
+            logger.warning("No epoch-level training metrics were captured")
+
+        logger.info("[5/6] Predicting held-out stimulated profiles for %s", holdout)
+        pred, _ = model.predict(ctrl_key="control", stim_key="stimulated",
+                                celltype_to_predict=holdout)
+        if pred is None or pred.n_obs == 0:
+            raise RuntimeError("scGen returned an empty prediction")
+
+        metrics, arrays = evaluate_prediction(pb, pred, cytokine, holdout, strategy)
+
+        logger.info("[6/6] Results | %s | holdout=%s | strategy=%s | min_cells=%d",
+                    cytokine, holdout, strategy, min_cells)
+        logger.info("scGen: r=%.4f mse=%.6f top100_r=%.4f sign=%.3f | mode=%s | n_eval_donors=%s",
+                    metrics["pearson_all"], metrics["mse"], metrics["pearson_top100"],
+                    metrics["sign_agreement"], metrics["evaluation_mode"], metrics["n_eval_donors"])
+
+        if wandb_run is not None:
+            # One final value per run -> summary, not history.
+            wandb_run.summary.update({
+                "scGen/r_all": metrics["pearson_all"],
+                "scGen/r_top100": metrics["pearson_top100"],
+                "scGen/mse": metrics["mse"],
+                "scGen/sign_agreement": metrics["sign_agreement"],
+                "data/n_profiles": pb.n_obs,
+                "data/n_train_profiles": train.n_obs,
+                "data/n_heldout_stim_profiles": heldout_stim_n,
+                "data/n_eval_donors": metrics["n_eval_donors"],
+                "data/n_donors": n_donors,
+                "data/n_train_source_cells": n_train_source_cells,
+                "data/median_cells_per_pseudobulk": float(pb.obs["n_cells"].median()),
+                "data/min_cells_observed": int(pb.obs["n_cells"].min()),
+                "data/max_cells_observed": int(pb.obs["n_cells"].max()),
+            })
+    finally:
+        # Always close the run, even if predict/evaluate raised.
+        if wandb_run is not None:
+            wandb_run.finish()
 
     tag = "__".join([safe_name(strategy), f"min{min_cells}",
                      safe_name(cytokine), safe_name(holdout)])
