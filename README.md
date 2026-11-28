@@ -1,12 +1,24 @@
-# Shared scGen and similarity-guided perturbation transfer
+# Shared scGen with learned cytokine perturbation models
 
 ## Setup
 
-Run the following commands from the root of the modified `cytoX-hcd-scgen-shared` repository with the scGen Python environment activated. Use a CUDA-enabled PyTorch installation for GPU runs.
+Run all commands from the repository root with the scGen Python environment activated. GPU training requires CUDA-enabled PyTorch.
 
-Required scripts: `subset_hcd.py`, `scgen_baseline.py`, `scgen_shared.py`, `compare_shared.py`, `ablation_similarity_transfer_v2.py`, and `plot_final_model_scores.py`.
+Required scripts: `subset_hcd.py`, `scgen_baseline.py`, `scgen_baseline_gpu.py`, `scgen_shared.py`, and `train_nonlinear_shared_scgen.py`.
 
-All experiments use the same six cytokines, 7,000 highly variable genes (HVGs), and the CD14 Mono cell-type holdout. Donors are pooled; no donor split is introduced.
+Use the **simplified fixed-epoch version** of the perturbation training script (previously named `train_nonlinear_shared_scgen_simple.py`), saved in the repository as `train_nonlinear_shared_scgen.py`.
+
+All experiments use the same six cytokines, 7,000 highly variable genes (HVGs), and CD14 Mono cell-type holdout. PBS is the control condition. Donors are pooled; no donor split is introduced. Treated CD14 Mono cells are excluded from training and used for final evaluation.
+
+## Overview
+
+The experiments address three questions:
+
+- Can a shared VAE replace independent cytokine-specific VAEs while retaining cytokine-specific latent shifts?
+- Does increasing the shared latent dimension from 100 to 200 help represent multiple cytokine responses?
+- Can directly learning the perturbation transformation improve prediction over the original scGen centroid-based arithmetic?
+
+The final comparison includes eight configurations: the original naive baseline, original cytokine-specific scGen Z100, shared scGen Z100, shared scGen Z200, and four learned perturbation heads (global, affine, nonlinear and hybrid).
 
 ## 1. Subset the HCD dataset
 
@@ -51,9 +63,9 @@ for CYT in IFN-beta IFN-gamma IL-1-beta IL-15 IL-32-beta IL-4; do
 done
 ```
 
-Results: `data/original_CD14_Mono/results.csv`
+Results: `data/original_CD14_Mono/results.csv`. Use a fresh output directory if retraining to avoid duplicate result rows.
 
-This step can be skipped if using the historical cytokine-specific results included in the repository.
+This step is optional when using the historical cytokine-specific Z100 scores bundled in the repository. The final comparison imports these historical scores by default; the freshly trained scores above do not automatically replace them.
 
 ## 3. Train the shared scGen baseline (Z100)
 
@@ -89,19 +101,9 @@ CUDA_VISIBLE_DEVICES=0 python -u scgen_shared.py \
 
 Output: one shared VAE, six cytokine predictions, and `data/shared_CD14_Mono/results.csv`.
 
-## 4. Compare the shared Z100 model with the historical cytokine-specific models
+## 4. Train the shared scGen model (Z200)
 
-Compare against the original L2/H800/Z100 results bundled in `analysis/results_L2_vs_L4_H800_Z100.csv`. The comparison checks that the original naive scores match before writing the results.
-
-```bash
-python compare_shared.py data/shared_CD14_Mono --historical
-```
-
-Output: `data/shared_CD14_Mono/comparison.csv`.
-
-## 5. Ablate latent dimensionality (Z200 and Z400)
-
-Test whether latent capacity limits the shared model. One Z100 VAE may need to represent cell identity, baseline heterogeneity and six cytokine perturbations, whereas each original Z100 VAE is trained on PBS and a single cytokine. Increase latent dimensionality while keeping all other training settings unchanged.
+Test whether the shared representation requires greater latent capacity to accommodate cell identity, baseline heterogeneity and multiple cytokine responses. Increase the latent dimension to 200 while retaining the original scGen perturbation arithmetic and other VAE settings.
 
 ```bash
 CUDA_VISIBLE_DEVICES=0 python -u scgen_shared.py \
@@ -112,266 +114,155 @@ CUDA_VISIBLE_DEVICES=0 python -u scgen_shared.py \
     --n-hidden 800 \
     --n-latent 200 \
     --outdir data/shared_CD14_Mono_Z200
+```
 
-CUDA_VISIBLE_DEVICES=0 python -u scgen_shared.py \
+Output: the shared Z200 VAE checkpoint and `data/shared_CD14_Mono_Z200/results.csv`.
+
+The trained Z200 encoder and decoder are reused and frozen in the next step.
+
+## 5. Train and compare the four learned perturbation models
+
+Test whether a trainable perturbation head can improve on the fixed
+latent translation used by scGen.
+
+The shared Z200 encoder and decoder remain frozen. Each perturbation
+model learns its own 32-dimensional embedding for each of the six cytokines.
+
+### Prediction workflow
+
+1. Encode the untreated PBS cell into a 200-dimensional latent representation.
+2. Retrieve the learned 32-dimensional embedding of the selected cytokine.
+3. Estimate a 200-dimensional perturbation vector using the trained head.
+4. Add the estimated perturbation vector to the original latent representation.
+5. Decode the modified latent representation into predicted expression
+   across 7,000 genes.
+
+The four models differ only in how the perturbation vector is estimated.
+
+### Perturbation-head architectures
+
+| Head | Perturbation estimation | Architecture | Trainable parameters |
+|---|---|---|---:|
+| Global | Cytokine-specific shift, independent of the initial cellular state | Linear: 32 → 200 | 6,792 |
+| Affine | Linear combination of the initial cellular state and cytokine embedding | Linear: 232 → 200 | 46,792 |
+| Nonlinear | Nonlinear interaction between the initial cellular state and cytokine embedding | MLP: 232 → 256 → 256 → 200 | 177,032 |
+| Hybrid | Global cytokine-specific shift plus a nonlinear state-dependent correction | Global linear branch + nonlinear MLP | 183,632 |
+
+The nonlinear and hybrid models use GELU activation functions and
+dropout (0.1) in their hidden layers.
+
+### Scientific questions
+
+| Comparison | Question addressed |
+|---|---|
+| Default shared scGen vs. learned global | Does directly optimizing a cytokine-specific shift improve upon centroid subtraction? |
+| Global vs. affine | Does incorporating the initial cellular state improve perturbation estimation? |
+| Affine vs. nonlinear | Are nonlinear interactions between cellular state and cytokine identity beneficial? |
+| Nonlinear vs. hybrid | Does explicitly combining a global response with a state-dependent correction improve generalization? |
+
+### Training strategy
+
+All four perturbation heads are trained independently using the same
+frozen shared Z200 VAE.
+
+- 13 source cell types.
+- Six cytokine treatments.
+- 78 cell-type–cytokine training groups.
+- Up to 128 randomly sampled PBS cells per group per optimization step.
+- 100 training epochs per model.
+- AdamW optimizer with a learning rate of 0.001.
+- Mean squared error across all 7,000 genes.
+- No epoch selection, validation split, or refitting.
+- No additional encoder or decoder training.
+- No explicit cell-type labels as model inputs.
+- No similarity-based source selection during prediction.
+
+The training objective minimizes the difference between the mean
+predicted treated expression and the experimentally observed treated
+expression for each source cell-type–cytokine group.
+
+Individual PBS and treated cells are not artificially paired.
+Although the decoder is frozen, gradients propagate through its
+operations to update the perturbation head and cytokine embeddings.
+
+Treated CD14 Mono cells remain excluded from training and are used
+only for final evaluation.
+
+### Training
+
+Each head is initialized once and trained independently for exactly
+100 epochs on all 13 source cell types (78 cell-type–cytokine groups).
+There is no epoch selection, validation split, refitting, or VAE retraining.
+
+For each source group, up to 128 PBS cells are randomly sampled from
+the precomputed latent representations. The perturbation head estimates
+their latent shifts, and the frozen decoder generates predicted
+treated gene expression.
+
+The training objective is to minimize the mean squared error (MSE)
+between the predicted and experimentally observed treated group means
+across all 7,000 genes.
+
+No individual PBS–treated cell pairing is assumed.
+
+Only the perturbation head and its cytokine embeddings are updated.
+Gradients pass through the frozen decoder without changing its parameters.
+
+### Run
+
+The following saved inputs are required:
+
+- `analysis/results_L2_vs_L4_H800_Z100.csv` — historical original scGen Z100 benchmark.
+- `data/shared_CD14_Mono/results.csv` — shared scGen Z100 scores.
+- `data/shared_CD14_Mono_Z200/results.csv` — default shared scGen Z200 scores.
+- `data/shared_CD14_Mono_Z200/shared__CD14_Mono/model.pt` — frozen shared Z200 VAE.
+
+```bash
+CUDA_VISIBLE_DEVICES=0 python -u train_nonlinear_shared_scgen.py \
     --data data/hcd_subset.h5ad \
+    --run data/shared_CD14_Mono_Z200 \
     --holdout "CD14 Mono" \
+    --embedding-dim 32 \
+    --hidden 256 \
     --epochs 100 \
-    --n-layers 2 \
-    --n-hidden 800 \
-    --n-latent 400 \
-    --outdir data/shared_CD14_Mono_Z400
-```
-
-Compare both models against the original cytokine-specific Z100 reference:
-
-```bash
-python compare_shared.py data/shared_CD14_Mono_Z200 --historical
-python compare_shared.py data/shared_CD14_Mono_Z400 --historical
-```
-
-## 6. Compare Z100, Z200 and Z400 together
-
-Summarize the three shared latent-dimensionality configurations alongside the historical original scGen and original naive baselines. Retain both real-PBS and reconstructed-PBS evaluations for scGen. The naive baseline uses real PBS only.
-
-```bash
-python - <<'PY'
-from pathlib import Path
-import pandas as pd
-
-out = Path('data/latent_dimension_comparison')
-out.mkdir(parents=True, exist_ok=True)
-
-runs = {
-    'Shared Z100': 'data/shared_CD14_Mono',
-    'Shared Z200': 'data/shared_CD14_Mono_Z200',
-    'Shared Z400': 'data/shared_CD14_Mono_Z400',
-}
-metrics = ['r_all', 'r_top100', 'mse']
-keys = ['cytokine', 'holdout', 'model']
-parts = []
-
-for name, folder in runs.items():
-    df = pd.read_csv(Path(folder) / 'comparison.csv')
-    assert len(df) == 18 and not df.duplicated(keys).any()
-    assert set(df['holdout']) == {'CD14 Mono'}
-    assert df['cytokine'].nunique() == 6
-
-    shared = df.loc[df.model != 'naive', keys +
-                    [m + '_shared' for m in metrics]].copy()
-    shared = shared.rename(columns={m + '_shared': m for m in metrics})
-    parts.append(shared.assign(architecture=name))
-
-    if name == 'Shared Z100':
-        original = df[keys + [m + '_original' for m in metrics]].copy()
-        original = original.rename(columns={m + '_original': m for m in metrics})
-        original['architecture'] = original.model.map(
-            {'naive': 'Original naive', 'scGen': 'Original scGen Z100',
-             'scGen_vs_real_ctrl': 'Original scGen Z100'})
-        parts.insert(0, original)
-
-scores = pd.concat(parts, ignore_index=True)
-scores['reference'] = scores.model.map({
-    'scGen': 'reconstructed_PBS',
-    'scGen_vs_real_ctrl': 'real_PBS',
-    'naive': 'real_PBS',
-})
-scores.to_csv(out / 'scores_by_cytokine.csv', index=False)
-summary = scores.groupby(['reference', 'architecture'], sort=False)[metrics].mean()
-summary.to_csv(out / 'summary.csv')
-print(summary.to_string(float_format=lambda x: f'{x:.6f}'))
-
-# Plot latent dimensionality comparison
-import matplotlib.pyplot as plt
-
-order = [
-    'Original naive',
-    'Original scGen Z100',
-    'Shared Z100',
-    'Shared Z200',
-    'Shared Z400',
-]
-
-colors = [
-    '#999999',
-    '#4477AA',
-    '#88CCEE',
-    '#228833',
-    '#AA3377',
-]
-
-references = {
-    'real_PBS': 'Real PBS',
-    'reconstructed_PBS': 'Reconstructed PBS',
-}
-
-metric_labels = {
-    'r_all': 'Pearson r | all genes',
-    'r_top100': 'Pearson r | top 100 genes',
-    'mse': 'Mean squared error',
-}
-
-plt.rcParams.update({
-    'font.family': 'DejaVu Sans',
-    'font.size': 11,
-    'axes.spines.top': False,
-    'axes.spines.right': False,
-    'svg.fonttype': 'none',
-    'pdf.fonttype': 42,
-})
-
-fig, axes = plt.subplots(
-    2, 3, figsize=(15, 7),
-    sharex='col',
-    constrained_layout=True,
-)
-
-for i, (ref, ref_label) in enumerate(references.items()):
-
-    plot_df = summary.loc[ref].reindex(order).dropna().copy()
-    
-    plot_order = plot_df.index.tolist()
-    plot_colors = [colors[order.index(m)] for m in plot_order]
-
-    for j, metric in enumerate(metrics):
-        ax = axes[i, j]
-        values = plot_df[metric]
-
-        bars = ax.barh(
-            plot_order, values,
-            color=plot_colors,
-            height=0.65,
-        )
-
-        ax.invert_yaxis()
-
-        ax.bar_label(
-            bars,
-            fmt='%.5f' if metric == 'mse' else '%.3f',
-            padding=4,
-            fontsize=10,
-        )
-
-        ax.set_title(
-            f'{ref_label}\n{metric_labels[metric]}',
-            fontweight='bold',
-            fontsize=12,
-        )
-
-        ax.grid(axis='x', alpha=0.2)
-        ax.set_axisbelow(True)
-
-        if metric == 'mse':
-            ax.set_xlim(0, summary[metric].max() * 1.25)
-            ax.set_xlabel('MSE (lower is better)')
-        else:
-            ax.set_xlim(min(0, summary[metric].min() * 1.2), 1.12)
-            ax.set_xlabel('Pearson r (higher is better)')
-
-        if j != 0:
-            ax.tick_params(axis='y', labelleft=False)
-
-fig.suptitle(
-    'Effect of latent dimensionality on prediction performance',
-    fontsize=17,
-    fontweight='bold',
-)
-
-for ext in ['png', 'pdf', 'svg']:
-    fig.savefig(
-        out / f'latent_dimension_comparison.{ext}',
-        dpi=600,
-        bbox_inches='tight',
-    )
-
-plt.close(fig)
-PY
-```
-
-Outputs: `data/latent_dimension_comparison/scores_by_cytokine.csv` and `summary.csv`.
-
-## 7. Ablate the latent-shift estimation strategy
-
-Use the frozen shared Z200 checkpoint to test whether similarity-guided
-source-cell selection and proportional weighting improve perturbation
-transfer. No VAE retraining is required.
-
-### Source-cell selection and weighting
-
-The target cell type is the held-out cell type whose cytokine response
-we aim to predict (CD14 Mono). The remaining 13 cell types are referred
-to as source cell types.
-
-Source cell types are ranked by cosine similarity between their mean
-PBS latent representations (latent centroids) and that of the target
-cell type.
-
-For each source cell type, a cytokine-specific latent shift is calculated
-by subtracting its mean PBS latent representation from its mean
-stimulated latent representation.
-
-**K** denotes the number of most similar source cell types selected
-to estimate the perturbation:
-
-- **K1:** Use the most similar source cell type.
-- **K2:** Combine the shifts of the two most similar source cell types.
-- **K3–K10:** Incorporate additional source cell types in descending
-  order of similarity.
-
-Two weighting strategies are evaluated:
-
-- **Equal weighting:** Each selected source contributes equally (1/K).
-- **Similarity-proportional weighting:** Each selected source contributes
-  according to its normalized positive cosine similarity.
-
-The combined latent shift is added to the PBS latent representations
-of the target cells and decoded to predict stimulated gene expression.
-
-### Ablation experiments
-
-The analysis evaluates:
-
-- Top-K source selection versus randomly selected subsets of the same size.
-- All 78 possible pairs of the 13 source cell types.
-- Association between source-pair similarity and prediction accuracy
-  using Spearman correlation.
-- Equal versus proportional weighting across K = 1–10.
-- Alignment of the combined perturbation vector with the equal-weighted
-  K2 latent shift.
-- A strong learning-free K1 baseline that selects the closest source
-  using cosine similarity between mean PBS gene-expression profiles
-  and transfers its perturbation directly in gene space, without a VAE.
-
-```bash
-CUDA_VISIBLE_DEVICES=0 python -u ablation_similarity_transfer_v2.py \
-    --data data/hcd_subset.h5ad \
-    --shared-z100 data/shared_CD14_Mono \
-    --shared-z200 data/shared_CD14_Mono_Z200 \
-    --holdout "CD14 Mono" \
-    --k-max 10 \
-    --random-subsets 24 \
+    --batch-size 128 \
+    --lr 0.001 \
     --seed 42 \
     --device cuda \
-    --outdir data/similarity_transfer_FINAL
+    --heads global affine nonlinear hybrid \
+    --outdir data/nonlinear_shared_Z200_E32_fixed100
 ```
 
-For CPU inference, replace `CUDA_VISIBLE_DEVICES=0` with
-`CUDA_VISIBLE_DEVICES=""` and `--device cuda` with `--device cpu`.
+For CPU training, replace `CUDA_VISIBLE_DEVICES=0` with `CUDA_VISIBLE_DEVICES=""` and `--device cuda` with `--device cpu`. Use a new or empty output directory for each run.
 
-Outputs: `data/similarity_transfer_FINAL/results.csv`, `summary.csv`,
-source-selection and weighting tables, pair-similarity and Spearman
-correlation tables, and publication figures under `figures/`.
+### Evaluation and outputs
 
-## 8. Generate the final model-comparison figures (K2)
+The script automatically compares the following eight models:
 
-Compare the original naive, strong learning-free naive K1, original cytokine-specific scGen Z100, shared scGen Z100/Z200, matched all-source Z200, and shared Z200 K2 with equal and proportional weighting. Use real PBS as the common reference.
+| Model | Operation |
+|---|---|
+| Original naive | Recalculate the mean gene-space perturbation across all sources |
+| Original cytokine-specific scGen Z100 | Import historical scores |
+| Shared scGen Z100 | Import saved scores |
+| Shared scGen Z200 (default) | Import saved scores |
+| Learned global shift | Train once |
+| Learned affine shift | Train once |
+| Learned nonlinear shift | Train once |
+| Learned hybrid shift | Train once |
 
-```bash
-python plot_final_model_scores.py \
-    --results data/similarity_transfer_FINAL/results.csv \
-    --outdir data/final_model_comparison_K2
-```
+The three scGen baseline scores are imported, and the original naive scores are recalculated and checked against the saved benchmarks.
 
-Outputs: overall and cytokine-specific scores and figures in PNG, PDF and SVG formats under `data/final_model_comparison_K2/`.
+All models are evaluated against experimentally observed expression changes in CD14 Mono using Pearson correlation across all genes, Pearson correlation across the top 100 genes ranked by absolute observed change, and MSE. Real-PBS evaluation is available for all eight models; reconstructed-PBS evaluation is available only for the seven VAE-based models.
 
-For subsequent held-out cell-type experiments, fix the proposed model to L2/H800/Z200, latent-space cosine similarity, K = 2 and equal weights. The strong naive K1 remains the independent learning-free baseline.
+Results are written to `data/nonlinear_shared_Z200_E32_fixed100/`, including:
+
+- `results.csv` and `summary.csv`: per-cytokine and aggregate scores.
+- `training_history.csv`: the four fixed-epoch training curves.
+- `head_*.pt` and `cytokine_embeddings_*.csv`: trained heads and embeddings.
+- `learned_shift_summary.csv`, `hybrid_shift_components.csv`, and `hybrid_global_shifts.csv`: estimated latent perturbations.
+- `paired_comparisons.csv` and `paired_comparison_summary.csv`: benchmark comparisons.
+- `validation.csv` and `run_config.json`: consistency checks and run settings.
+
+The script automatically generates the overall comparison plots, per-cytokine heatmaps, and training curves in `figures/` (PNG, PDF and SVG). No separate plotting command is required.
+
+At inference, the learned heads require the frozen shared VAE, trained head and cytokine embedding.
