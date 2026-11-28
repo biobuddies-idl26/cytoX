@@ -266,3 +266,254 @@ Results are written to `data/nonlinear_shared_Z200_E32_fixed100/`, including:
 The script automatically generates the overall comparison plots, per-cytokine heatmaps, and training curves in `figures/` (PNG, PDF and SVG). No separate plotting command is required.
 
 At inference, the learned heads require the frozen shared VAE, trained head and cytokine embedding.
+
+## 6. Visualize cellular states and cytokine-induced latent perturbations
+
+Investigate how cellular states are represented in the shared latent
+space and compare the perturbations predicted by shared scGen Z200
+and the learned hybrid model.
+
+Both scripts use previously trained models or saved predictions.
+No additional training is required.
+
+### Models included
+
+| Model | Perturbation estimation |
+|---|---|
+| Shared scGen Z200 | Fixed cytokine-specific latent shift calculated by centroid subtraction |
+| Learned hybrid | Learned global cytokine shift plus a nonlinear state-dependent correction |
+
+Both models use the same frozen 200-dimensional latent representation,
+allowing direct comparison of their predicted cellular states.
+
+### 6.1. Visualize latent states and perturbation vectors
+
+Install UMAP if needed:
+
+```bash
+python -m pip install umap-learn
+```
+
+Run:
+
+```bash
+CUDA_VISIBLE_DEVICES=0 python -u visualize_all_latent_shifts.py \
+    --data data/hcd_subset.h5ad \
+    --shared-z200 data/shared_CD14_Mono_Z200 \
+    --heads-dir data/nonlinear_shared_Z200_E32_fixed100 \
+    --holdout "CD14 Mono" \
+    --device cuda \
+    --outdir data/all_latent_shifts_Z200_hybrid_v2
+```
+
+Use a new or empty output directory for each run.
+
+#### Visualization strategy
+
+Two separate UMAP representations are generated using all 200 latent dimensions:
+
+- **Reference UMAP:** Fitted on reference cells, excluding treated
+  CD14 Mono cells. Predicted and experimentally observed target cells
+  are subsequently projected into this space.
+- **Target-only UMAP:** Fitted exclusively on experimentally measured
+  CD14 Mono cells, including PBS and all six cytokine conditions.
+  This provides a more detailed view of target-cell perturbations
+  without displaying other cell populations.
+
+All predictions are generated before constructing the target-only UMAP.
+The experimentally observed treated target cells are used for
+visualization and evaluation only, not for perturbation estimation.
+
+#### Reference UMAP figures
+
+Located under `Z200/figures/umap/`.
+
+| Figure | Description |
+|---|---|
+| `01_cell_state.png` | Cellular states colored by cell type and cytokine treatment. |
+| `02_states_by_treatment.png` | Cellular distributions under PBS and each cytokine using identical coordinates. |
+| `03_source_observed_arrows.png` | Experimentally observed PBS-to-treated centroid movements for each source cell type. |
+| `04_target_all_model_arrows.png` | Shared scGen and hybrid predicted target movements compared with the observed response. |
+| `05_source_predictions_default.png` | Shared scGen predictions compared with observed source-cell responses. |
+| `05_source_predictions_hybrid.png` | Hybrid predictions compared with observed source-cell responses. |
+
+Source-cell predictions are in-sample diagnostics rather than
+independent evaluations of model generalization.
+
+#### Target-only UMAP figures
+
+Located under `Z200/figures/umap/target_only_umap/`.
+
+A dedicated figure is generated for each cytokine, showing:
+
+- Untreated PBS cells and their centroid.
+- Experimentally observed treated cells and their centroid.
+- Shared scGen predicted centroid.
+- Hybrid predicted centroid.
+- Arrows connecting the starting PBS centroid to each endpoint.
+
+Additional summary figures are generated under `overview/`.
+
+| Figure | Description |
+|---|---|
+| `01_cell_state.png` | Target cellular states colored by treatment status and cytokine identity. |
+| `02_states_by_treatment.png` | Target-cell distributions under PBS and each cytokine. |
+| `03_observed_target_arrows.png` | Experimentally observed target centroid movements. |
+| `04_target_all_model_arrows.png` | Shared scGen and hybrid predicted movements compared with observed movements. |
+| `05_target_predictions_default.png` | Shared scGen predicted cell distributions and centroid movements. |
+| `05_target_predictions_hybrid.png` | Hybrid predicted cell distributions and centroid movements. |
+
+All overview panels use the same target-only UMAP coordinates and
+axis limits.
+
+#### Perturbation direction, similarity and magnitude
+
+Located under `Z200/figures/`.
+
+| Figure | Description |
+|---|---|
+| `04_UMAP_shift_directions.png` | UMAP of observed source perturbation directions, colored by cell type or cytokine. |
+| `05_latent_shift_directions.png` | Signed components of normalized perturbation vectors across all 200 latent dimensions. |
+| `06_shift_cosine_similarity.png` | Pairwise cosine similarity between observed perturbation directions. |
+| `07_cell_type_shift_similarity_per_cytokine.png` | Similarity of responses between cell types exposed to the same cytokine. |
+| `08_cytokine_shift_similarity_per_cell_type.png` | Similarity of responses to different cytokines within the same cell type. |
+| `09_latent_shift_magnitudes.png` | Magnitude of each experimentally observed cell-type–cytokine perturbation. |
+| `10_full_latent_prediction_metrics.png` | Quantitative comparison of shared scGen and hybrid target predictions. |
+
+Figures 05, 06, 07 and 08 are generated in two versions:
+
+- **Non-clustered:** Fixed cell-type and cytokine ordering to facilitate
+  comparisons across panels.
+- **Clustered:** Hierarchical clustering using cosine distance and
+  average linkage to reveal groups with similar perturbation directions.
+
+Clustered figures have the suffix `_clustered`. Both versions use
+identical similarity values and color scales.
+
+#### Understanding the perturbation arrows
+
+- **Observed perturbations:** Calculated by subtracting the mean PBS
+  latent representation from the mean experimentally measured treated
+  latent representation.
+- **Predicted perturbations:** Calculated by applying the corresponding
+  perturbation model to untreated cells.
+
+Solid arrows represent predicted movements, whereas dashed arrows
+represent experimentally observed movements in prediction comparisons.
+
+Shared scGen applies the same latent perturbation vector to every
+cell for a given cytokine. The hybrid model can generate different
+perturbation vectors for individual cells depending on their initial
+latent states.
+
+#### Quantitative latent-space evaluation
+
+| Metric | Interpretation | Ideal value |
+|---|---|---|
+| Cosine similarity | Agreement between predicted and observed perturbation directions | 1 |
+| Relative centroid error | Prediction error relative to the observed perturbation magnitude | 0 |
+| Shift magnitude ratio | Predicted magnitude divided by observed magnitude | 1 |
+| Within-cell-type shift RMS | Variation of predicted perturbation vectors among individual cells | Model-dependent |
+
+All metrics are calculated using the original 200-dimensional latent
+vectors rather than their two-dimensional UMAP coordinates.
+
+### 6.2. Visualize individual-cell perturbation predictions
+
+Centroid-based visualization shows whether the models predict the
+average movement of a cellular population. However, predicting the
+correct centroid does not necessarily imply that the predicted cells
+reproduce the experimentally observed treated-cell distribution.
+
+This additional analysis visualizes the predicted latent position of
+every individual PBS cell using shared scGen and hybrid.
+
+Run:
+
+```bash
+python -u visualize_target_cell_predictions.py \
+    --input-dir data/all_latent_shifts_Z200_hybrid_v2
+```
+
+The script reuses the saved target-only UMAP coordinates and individual
+cell predictions generated in Step 6.1. No GPU, model loading,
+retraining or additional UMAP fitting is required.
+
+#### Generated figures
+
+One figure per cytokine containing three comparable panels:
+
+| Panel | Content |
+|---|---|
+| A — Experimentally observed | PBS and experimentally observed treated cells |
+| B — Shared scGen Z200 | PBS, observed treated cells and all shared scGen predicted cells |
+| C — Learned hybrid | PBS, observed treated cells and all hybrid predicted cells |
+
+All three panels use identical UMAP coordinates and axis limits.
+
+These figures allow us to investigate whether the predicted populations
+capture the location, spread and heterogeneity of experimentally
+observed treated populations, beyond their mean centroid positions.
+
+Optionally, visualize individual PBS-to-prediction movements:
+
+```bash
+python -u visualize_target_cell_predictions.py \
+    --input-dir data/all_latent_shifts_Z200_hybrid_v2 \
+    --cell-arrows 50
+```
+
+This displays 50 individual computational cell movements per model,
+while retaining all predicted cells in the figures.
+
+Results are saved under:
+
+`Z200/figures/umap/target_only_umap/cell_level_comparison/`
+
+### Interpretation
+
+UMAP is a nonlinear projection. Arrow lengths, angles and distances
+do not necessarily preserve the geometry of the original latent space.
+
+All predicted cellular states are visualized directly in latent space,
+before decoding into gene expression.
+
+Experimentally measured PBS and treated cells are unpaired. Therefore,
+overlap between predicted and observed distributions does not establish
+accurate individual-cell responses.
+
+The latent-space analyses complement, rather than replace, the
+gene-expression prediction metrics described in Step 5.
+
+### Output directory
+
+```text
+data/all_latent_shifts_Z200_hybrid_v2/
+├── FIGURE_GUIDE.txt
+├── run_config.json
+├── all_latent_prediction_metrics.csv
+└── Z200/
+    ├── figures/
+    │   ├── umap/
+    │   │   ├── Reference UMAP figures
+    │   │   └── target_only_umap/
+    │   │       ├── Individual cytokine centroid figures
+    │   │       ├── overview/
+    │   │       └── cell_level_comparison/
+    │   ├── Perturbation direction figures
+    │   ├── Clustered and non-clustered similarity heatmaps
+    │   └── Quantitative prediction figures
+    ├── latent_embeddings.npz
+    ├── latent_centroids.csv
+    ├── latent_prediction_metrics.csv
+    ├── predicted_and_observed_mean_shifts.csv
+    ├── target_predicted_latent_states.npz
+    ├── target_only_umap_coordinates.csv
+    ├── target_only_umap_predictions.npz
+    └── Additional numerical results
+```
+
+All figures are generated as PNG files. Full-dimensional latent
+representations, perturbation vectors, predicted cellular states,
+UMAP coordinates and quantitative metrics are retained for
+subsequent analysis.
